@@ -63,7 +63,7 @@ try {
     respond([
         'success'  => true,
         'message'  => 'Login successful! Redirecting...',
-        'redirect' => BASE_URL . '?page=home',
+        'redirect' => BASE_URL . '?page=home_main',
     ]);
 } catch (mysqli_sql_exception $e) {
     error_log($e->getMessage());
