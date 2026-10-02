@@ -76,7 +76,7 @@ foreach ($cartItems as $item) {
 
                 <nav class="breadcrumb" aria-label="Breadcrumb">
 
-                    <a href="index.php">Home</a>
+                    <a href="<?= BASE_URL ?>?page=home_main">Home</a>
 
                     <i class="fa-solid fa-chevron-right"></i>
 

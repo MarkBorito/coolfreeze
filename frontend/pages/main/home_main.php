@@ -86,7 +86,7 @@ function statusClass($status)
                     aria-label="Breadcrumb"
                 >
 
-                    <a href="index.php">
+                    <a href="<?= BASE_URL ?>?page=home_main">
                         Home
                     </a>
 
@@ -120,7 +120,7 @@ function statusClass($status)
                         Services
                     </h2>
 
-                    <a href="<?= BASE_URL ?>frontend/pages/main/servicesmain.php" class="view-all">
+                    <a href="<?= BASE_URL ?>?page=services_main" class="view-all">
                         View all
                         <i class="fa-solid fa-arrow-right"></i>
                     </a>
@@ -131,7 +131,7 @@ function statusClass($status)
 
                     <?php foreach ($services as $service): ?>
 
-                        <a href="service.php?id=<?= (int) $service['id'] ?>" class="service-card">
+                        <a href="<?= BASE_URL ?>?page=services_main" class="service-card">
 
                             <span class="service-icon">
                                 <i class="fa-solid <?= e($service['icon']) ?>"></i>
@@ -159,7 +159,7 @@ function statusClass($status)
 
                         <h2 class="panel-title">My Recent Request</h2>
 
-                        <a href="requests.php" class="view-all">
+                        <a href="<?= BASE_URL ?>?page=request_main" class="view-all">
                             View all
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
@@ -219,7 +219,7 @@ function statusClass($status)
                             Show <?= (int) $totalRequests ?> of <?= (int) $totalRequests ?> requests
                         </span>
 
-                        <a href="requests.php?new=1" class="new-request">
+                        <a href="<?= BASE_URL ?>?page=services_main" class="new-request">
                             + New Request
                             <i class="fa-solid fa-arrow-right"></i>
                         </a>
