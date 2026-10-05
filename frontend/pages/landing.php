@@ -333,7 +333,7 @@
     <footer id="sitefooter">
         <div class="footer__top">
             <div class="footer__brand">
-                <img src="frontend/assets/img/CoolFreeze_Logo.svg" alt="CoolFreeze">
+                <img src="frontend/assets/img/CoolFreeze_horizontal_logo.svg" alt="CoolFreeze">
                 <p>Reliable air conditioning services for homes and businesses — installation, repair, cleaning, maintenance, and parts, all in one place.</p>
                 <div class="footer__social">
                     <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
