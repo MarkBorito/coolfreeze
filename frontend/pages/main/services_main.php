@@ -61,7 +61,7 @@ function e($value)
                     aria-label="Breadcrumb"
                 >
 
-                    <a href="index.php">
+                    <a href="<?= BASE_URL ?>?page=home_main">
                         Home
                     </a>
 

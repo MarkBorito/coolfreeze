@@ -1776,6 +1776,27 @@ select {
   cursor: pointer;
 }
 
+
+.detail-actions {
+  display: flex;
+
+  margin-top: 14px;
+}
+
+.btn-danger {
+  border: 1px solid var(--danger);
+
+  background: var(--white);
+
+  color: var(--danger);
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+
+  color: var(--white);
+}
+
 .btn-primary:hover {
   background: var(--primary-dark);
 }

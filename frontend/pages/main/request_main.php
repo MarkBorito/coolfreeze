@@ -165,7 +165,7 @@ foreach ($requests as $request) {
 <div class="layout">
 
     <!-- SIDEBAR -->
-   <?php require FRONTEND_PATH . 'includes/sidebar.php' ?>
+    <?php require FRONTEND_PATH . 'includes/sidebar.php' ?>
 
     <!-- MOBILE OVERLAY -->
     <div class="overlay" id="overlay"></div>
@@ -179,19 +179,41 @@ foreach ($requests as $request) {
         <!-- PAGE CONTENT -->
         <main class="content">
 
-            <!-- HEADER -->
-            <section class="hero">
+            <div class="page-header">
 
-                <p class="hero-small">My Requests</p>
+                <nav
+                    class="breadcrumb"
+                    aria-label="Breadcrumb"
+                >
 
-                <h1>
+                    <a href="<?= BASE_URL ?>?page=home_main">
+                        Home
+                    </a>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                    <span>
+                        My Requests
+                    </span>
+
+                </nav>
+
+
+                <h1 class="page-title">
+
                     My
                     <span>Requests</span>
+
                 </h1>
 
-                <p class="hero-sub">What would you like to do today?</p>
 
-            </section>
+                <p class="page-subtitle">
+
+                    What would you like to do today?
+
+                </p>
+
+            </div>
 
             <!-- REQUESTS LIST -->
             <section class="panel">
@@ -421,6 +443,14 @@ foreach ($requests as $request) {
         </div>
     </div>
 
+    <!-- CANCEL ACTION (Pending requests only) -->
+    <div class="detail-actions" id="detailActions" style="display: none;">
+        <button type="button" class="btn btn-danger" id="detailCancelBtn">
+            <i class="fa-solid fa-ban"></i>
+            Cancel Request
+        </button>
+    </div>
+
 </aside>
 
 <!-- PROOF OF SERVICE MODAL (Completed requests only) -->
@@ -540,92 +570,10 @@ foreach ($requests as $request) {
      JAVASCRIPT
 ========================================================= -->
 
+<script src="<?= BASE_URL ?>frontend/assets/js/custom.js"></script>
+
 <script>
 
-(function () {
-
-    var menuButton = document.getElementById('menuButton');
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('overlay');
-
-
-    function setOpen(open) {
-
-        sidebar.classList.toggle('open', open);
-
-        overlay.classList.toggle('open', open);
-
-        menuButton.setAttribute(
-            'aria-expanded',
-            open ? 'true' : 'false'
-        );
-
-    }
-
-
-    if (menuButton && sidebar && overlay) {
-
-        menuButton.addEventListener('click', function () {
-
-            setOpen(
-                !sidebar.classList.contains('open')
-            );
-
-        });
-
-
-        overlay.addEventListener('click', function () {
-
-            setOpen(false);
-
-        });
-
-
-        sidebar
-            .querySelectorAll('.menu-link')
-            .forEach(function (link) {
-
-                link.addEventListener('click', function () {
-
-                    if (
-                        window.matchMedia(
-                            '(max-width: 900px)'
-                        ).matches
-                    ) {
-
-                        setOpen(false);
-
-                    }
-
-                });
-
-            });
-
-
-        window.addEventListener('resize', function () {
-
-            if (
-                !window.matchMedia(
-                    '(max-width: 900px)'
-                ).matches
-            ) {
-
-                setOpen(false);
-
-            }
-
-        });
-
-    }
-
-})();
-
-
-
-
-
-<script src="<?= BASE_URL ?>frontend/assets/js/custom.js"></script>
-<script>    
     // Full request detail data, keyed by list index — rendered by PHP above.
     const REQUESTS_DATA = <?= json_encode($requestsForJs, JSON_UNESCAPED_UNICODE) ?>;
 
@@ -677,6 +625,9 @@ foreach ($requests as $request) {
         var overlay = document.getElementById('detailOverlay');
         var panel = document.getElementById('detailPanel');
         var closeBtn = document.getElementById('detailClose');
+
+        // Request currently shown in the detail panel (used by Cancel)
+        var currentRequest = null;
 
         // -------------------- Proof of Service modal --------------------
         var proofOverlay = document.getElementById('proofOverlay');
@@ -737,6 +688,12 @@ foreach ($requests as $request) {
                 item.classList.remove('is-active');
             });
 
+            currentRequest = data;
+
+            // Cancel button only appears for Pending requests
+            document.getElementById('detailActions').style.display =
+                data.statusLabel === 'Pending' ? 'flex' : 'none';
+
             overlay.classList.add('show');
             panel.classList.add('show');
             panel.setAttribute('aria-hidden', 'false');
@@ -753,6 +710,38 @@ foreach ($requests as $request) {
                 item.classList.remove('is-active');
             });
         };
+
+        // -------------------- Cancel request (Pending only) --------------------
+        var cancelBtn = document.getElementById('detailCancelBtn');
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function () {
+                if (!currentRequest) {
+                    return;
+                }
+
+                if (!confirm('Cancel ' + currentRequest.requestId + '? This cannot be undone.')) {
+                    return;
+                }
+
+                // TODO: send the cancellation to the backend here
+                // (e.g. fetch('cancel_request.php', { method: 'POST', ... }))
+
+                // Update the list row so the UI reflects the change for now
+                var row = list.querySelector('[data-request-id="' + currentRequest.id + '"]');
+                if (row) {
+                    var rowBadge = row.querySelector('.badge');
+                    rowBadge.className = 'badge cancelled';
+                    rowBadge.textContent = 'Cancelled';
+                }
+
+                currentRequest.statusLabel = 'Cancelled';
+                currentRequest.statusDetail = 'Cancelled';
+                currentRequest.statusClass = 'cancelled';
+
+                closeDetail();
+            });
+        }
 
         var renderTechnicians = function (technicians) {
             var container = document.getElementById('proofTechnicians');
@@ -866,6 +855,7 @@ foreach ($requests as $request) {
             }
         });
     });
+
 </script>
 
 </body>
