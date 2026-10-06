@@ -660,9 +660,11 @@ $phoneText    = $user['phone']     !== '' ? $user['phone'] : 'Not set';
             day: 'numeric'
           }) :
           'Not set');
-        profileAvatar.src = u.profile_image_url;
-        avatarPreview.src = u.profile_image_url;
-        savedAvatarSrc = u.profile_image_url;
+        if (u.profile_image_url) {
+          profileAvatar.src = u.profile_image_url;
+          avatarPreview.src = u.profile_image_url;
+          savedAvatarSrc = u.profile_image_url;
+        }
         avatarInput.value = '';
         editPanel.querySelectorAll('input:not([type="file"]), textarea').forEach(function(field) {
           field.defaultValue = field.value;

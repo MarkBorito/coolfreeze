@@ -77,7 +77,7 @@ try {
             'phone'             => $fresh['phone'],
             'birthday'          => $fresh['birthday'],
             'address'           => $fresh['address'],
-            'profile_image_url' => BASE_URL . ($fresh['profile_image'] ?: 'frontend/assets/img/default-avatar.svg'),
+            'profile_image_url' => !empty($fresh['profile_image']) ? BASE_URL . $fresh['profile_image'] : null,
         ],
     ]);
 } catch (InvalidArgumentException $e) {
