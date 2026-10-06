@@ -1,5 +1,8 @@
+<?php if (empty($_SESSION['reset_verified_email'])) { header('Location: ' . BASE_URL . '?page=forget'); exit; } ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +14,7 @@
 </head>
 
 <!-- h-dvh + overflow-hidden: the page is exactly one screen tall and never scrolls -->
+
 <body class="h-dvh overflow-hidden bg-white text-gray-900 antialiased">
 
   <div class="flex h-full flex-col md:flex-row">
@@ -22,11 +26,9 @@
         <!-- Top: brand (mobile only) + back button -->
         <div>
           <h2 class="mb-4 text-xl font-bold text-blue-600 md:hidden">COOLFREEZE</h2>
-          <a
-            href="<?= BASE_URL ?>?page=login"
+          <a href="<?= BASE_URL ?>?page=login"
             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100"
-            aria-label="Back"
-          >
+            aria-label="Back">
             <img class="h-4 w-4" src="<?= BASE_URL . 'frontend/assets/img/back-arrow.svg' ?>" alt="">
           </a>
         </div>
@@ -41,49 +43,39 @@
             Create a new password, ensure it differs from the previous ones for security.
           </p>
 
-          <form class="mt-3 space-y-4" method="post" action="">
+          <div id="form-message" class="hidden"></div>
+
+          <form id="reset-form" class="mt-3 space-y-4" method="post"
+            action="<?= BASE_URL . 'backend/api/reset-password.php' ?>" novalidate>
 
             <!-- Password -->
             <div>
-            <label for="password" class="mb-1 block text-sm font-bold">Password</label>
-            <div class="relative">
-              <input
-                type="password"
-                id="password"
-                name="password"
-                autocomplete="new-password"
-                required
-                class="w-full rounded-md bg-gray-100 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your password"
-              >
-              <i class="bi bi-eye toggle-password absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-                data-target="password"></i>
+              <label for="password" class="mb-1 block text-sm font-bold">Password</label>
+              <div class="relative">
+                <input type="password" id="password" name="password" autocomplete="new-password" required
+                  class="w-full rounded-md bg-gray-100 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter your password">
+                <i class="bi bi-eye toggle-password absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                  data-target="password"></i>
+              </div>
+              <p class="field-error mt-1 hidden text-xs text-red-600" data-for="password"></p>
             </div>
-            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="password"></p>
-          </div>
 
-          <div>
-            <label for="confirm_password" class="mb-1 block text-sm font-bold">Confirm Password</label>
-            <div class="relative">
-              <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                autocomplete="new-password"
-                required
-                class="w-full rounded-md bg-gray-100 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Confirm your password"
-              >
-              <i class="bi bi-eye toggle-password absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
-                data-target="confirm_password"></i>
+            <div>
+              <label for="confirm_password" class="mb-1 block text-sm font-bold">Confirm Password</label>
+              <div class="relative">
+                <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password"
+                  required
+                  class="w-full rounded-md bg-gray-100 px-3 py-2 text-base outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Confirm your password">
+                <i class="bi bi-eye toggle-password absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                  data-target="confirm_password"></i>
+              </div>
+              <p class="field-error mt-1 hidden text-xs text-red-600" data-for="confirm_password"></p> <!-- NEW -->
             </div>
-            <p class="field-error mt-1 hidden text-xs text-red-600" data-for="confirm_password"></p> <!-- NEW -->
-          </div>
 
-            <button
-              type="submit"
-              class="w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
+            <button type="submit"
+              class="w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
               Update Password
             </button>
           </form>
@@ -103,11 +95,8 @@
 
     <!-- RIGHT SIDE: image (hidden on mobile, shown from md and up) -->
     <div class="relative hidden h-full overflow-hidden md:block md:w-1/2">
-      <img
-        src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
-        class="absolute inset-0 h-full w-full object-cover -scale-x-100"
-        alt=""
-      >
+      <img src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
+        class="absolute inset-0 h-full w-full object-cover -scale-x-100" alt="">
 
       <!-- Right-aligned text in the top part of the panel, above the aircon in the image -->
       <div class="absolute right-0 top-0 flex max-w-full flex-col items-end p-6 text-right lg:p-10">
@@ -125,5 +114,62 @@
 
   </div>
 
+  <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
+  <script>
+  (function() {
+    var form = document.getElementById('reset-form');
+    var msg = document.getElementById('form-message');
+    var btn = form.querySelector('button[type="submit"]');
+
+    function show(text, ok) {
+      msg.className = 'mt-4 rounded-md p-3 text-sm ' + (ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700');
+      msg.textContent = text;
+    }
+
+    function clearErrors() {
+      msg.className = 'hidden';
+      document.querySelectorAll('.field-error').forEach(function(p) {
+        p.classList.add('hidden');
+        p.textContent = '';
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+      btn.disabled = true;
+      btn.textContent = 'Updating...';
+      cfPost(form.action, new FormData(form)).then(function(res) {
+        if (res.success) {
+          show(res.message, true);
+          setTimeout(function() {
+            window.location.replace(res.redirect);
+          }, 1200);
+          return;
+        }
+        if (res.errors) {
+          Object.keys(res.errors).forEach(function(f) {
+            var p = document.querySelector('.field-error[data-for="' + f + '"]');
+            if (p) {
+              p.textContent = res.errors[f];
+              p.classList.remove('hidden');
+            }
+          });
+        } else {
+          show(res.message, false);
+          if (res.redirect) {
+            setTimeout(function() {
+              window.location.replace(res.redirect);
+            }, 1500);
+          }
+        }
+        btn.disabled = false;
+        btn.textContent = 'Update Password';
+      });
+    });
+  })();
+  </script>
+
 </body>
+
 </html>

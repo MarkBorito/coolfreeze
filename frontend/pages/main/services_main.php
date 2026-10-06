@@ -1,1211 +1,671 @@
 <?php
 
 require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
+require_once BACKEND_PATH . '/helpers/guard.php';
+require_once BACKEND_PATH . '/models/customer.php';
+require_once BACKEND_PATH . '/models/service.php';
+$unitTypes = unit_type_all_active($conn);
+$customer  = customer_find($conn, (int) $_SESSION['customer_id']);
 
 $userName = $_SESSION['username'] ?? 'Customer';
 
 $currentPage = 'services';
 
-function e($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-}
-
+function e($value) {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CoolFreeze | Services</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/main.css">
-
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    >
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoolFreeze | Services</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
 
-<div class="layout">
-    
+  <div class="layout">
     <?php require FRONTEND_PATH . 'includes/sidebar.php' ?>
 
     <div class="overlay" id="overlay"></div>
 
     <div class="main">
-        <?php require FRONTEND_PATH . 'includes/topbar.php' ?>
+      <?php require FRONTEND_PATH . 'includes/topbar.php' ?>
 
-        <main class="content">
+      <main class="content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="<?= BASE_URL ?>?page=home_main">
+              Home
+            </a>
+            <i class="fa-solid fa-chevron-right"></i>
+            <span>
+              Services
+            </span>
+          </nav>
 
-            <!-- PAGE HEADER -->
+          <h1 class="page-title">
+            Our
+            <span>Services</span>
+          </h1>
 
-            <div class="page-header">
+          <p class="page-subtitle">
+            Professional air conditioning services to keep
+            your home or business cool and comfortable
+          </p>
+        </div>
 
-                <nav
-                    class="breadcrumb"
-                    aria-label="Breadcrumb"
-                >
+        <section class="services-grid">
+          <!-- AC CLEANING -->
+          <article class="card" data-service-id="1">
+            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
+              class="card-img">
+            <div class="card-body">
+              <h2>
+                AC Cleaning
+              </h2>
+              <p class="desc">
+                Keep your aircon clean and efficient with
+                our professional cleaning service
+              </p>
+              <p class="includes">
+                Services include:
+              </p>
+              <ul class="checklist">
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  General cleaning
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Filter cleaning
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Unit inspection
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Basic performance check
+                </li>
+              </ul>
+              <div class="card-footer">
+                <div class="price">
+                  <i class="fa-solid fa-tag"></i>
+                  <div>
+                    <small>
+                      Starting from
+                    </small>
+                    <strong>
+                      ₱ 800
+                    </strong>
+                  </div>
+                </div>
+                <button type="button" class="btn-request">
+                  Request Service
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </article>
 
-                    <a href="<?= BASE_URL ?>?page=home_main">
-                        Home
-                    </a>
+          <!-- AC REPAIR -->
+          <article class="card" data-service-id="2">
+            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
+              class="card-img">
+            <div class="card-body">
+              <h2>
+                AC Repair
+              </h2>
+              <p class="desc">
+                We fix aircon problems quickly and efficiently
+                to get your unit back in condition
+              </p>
+              <p class="includes">
+                Services include:
+              </p>
+              <ul class="checklist">
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Diagnose the issue
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Repair faulty parts
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Test functionality
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Provide service report
+                </li>
+              </ul>
 
-                    <i class="fa-solid fa-chevron-right"></i>
+              <div class="card-footer">
+                <div class="price">
+                  <i class="fa-solid fa-tag"></i>
+                  <div>
+                    <small>
+                      Starting from
+                    </small>
+                    <strong>
+                      ₱ 1000
+                    </strong>
+                  </div>
+                </div>
 
-                    <span>
-                        Services
-                    </span>
+                <button type="button" class="btn-request">
+                  Request Service
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </article>
 
-                </nav>
+          <!-- AC MAINTENANCE -->
+          <article class="card" data-service-id="3">
+            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
+              class="card-img">
+            <div class="card-body">
+              <h2>
+                AC Maintenance
+              </h2>
+              <p class="desc">
+                Prevent problems before they happen with
+                our scheduled maintenance service
+              </p>
+              <p class="includes">
+                Services include:
+              </p>
+              <ul class="checklist">
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Full system check
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Clean and inspect components
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Optimize performance
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Extend unit lifespan
+                </li>
+              </ul>
+
+              <div class="card-footer">
+                <div class="price">
+                  <i class="fa-solid fa-tag"></i>
+                  <div>
+                    <small>
+                      Starting from
+                    </small>
+                    <strong>
+                      ₱ 1200
+                    </strong>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-request">
+                  Request Service
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- AC INSTALLATION -->
+          <article class="card" data-service-id="4">
+            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
+              class="card-img">
+            <div class="card-body">
+              <h2>
+                AC Installation
+              </h2>
+              <p class="desc">
+                Professional installation for your new
+                aircon unit
+              </p>
+              <p class="includes">
+                Services include:
+              </p>
+              <ul class="checklist">
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Site inspection
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Proper unit installation
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  System testing
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Warranty and support
+                </li>
+              </ul>
+
+              <div class="card-footer">
+                <div class="price">
+                  <i class="fa-solid fa-tag"></i>
+                  <div>
+                    <small>
+                      Starting from
+                    </small>
+                    <strong>
+                      ₱ 800
+                    </strong>
+                  </div>
+                </div>
+
+                <button type="button" class="btn-request">
+                  Request Service
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- PARTS REPLACEMENT -->
+          <article class="card" data-service-id="5">
+            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
+              class="card-img">
+            <div class="card-body">
+              <h2>
+                Parts Replacement
+              </h2>
+              <p class="desc">
+                Replace damaged parts with genuine and
+                high-quality components
+              </p>
+              <p class="includes">
+                Services include:
+              </p>
+              <ul class="checklist">
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Genuine parts
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Professional installation
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  System testing
+                </li>
+                <li>
+                  <i class="fa-solid fa-circle-check"></i>
+                  Warranty and replaced parts
+                </li>
+              </ul>
+
+              <div class="card-footer">
+                <div class="price">
+                  <i class="fa-solid fa-tag"></i>
+                  <div>
+                    <small>
+                      Starting from
+                    </small>
+                    <strong>
+                      ₱ 800
+                    </strong>
+                  </div>
+                </div>
+                <button type="button" class="btn-request">
+                  Request Service
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
 
 
-                <h1 class="page-title">
 
-                    Our
-                    <span>Services</span>
+  <!-- REQUEST SERVICE MODAL -->
+  <div class="modal-overlay" id="serviceModalOverlay">
+    <div class="modal" id="serviceModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-scroll">
+        <button type="button" class="modal-close" id="modalCloseBtn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
 
-                </h1>
+        <button type="button" class="modal-back" id="modalBackBtn">
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to Services
+        </button>
+
+        <h2 class="modal-title" id="modalTitle">
+          Request
+          <span>Service</span>
+        </h2>
+
+        <p class="modal-subtitle">
+          Fill in the details below to request
+          your selected service
+        </p>
+
+        <!-- STEPPER -->
+        <div class="stepper">
+          <div class="step active" data-step="1">
+            <div class="step-circle">
+              1
+            </div>
+            <div class="step-label">
+              Service Details
+            </div>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step" data-step="2">
+            <div class="step-circle">
+              2
+            </div>
+            <div class="step-label">
+              Schedule &amp; Location
+            </div>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="step" data-step="3">
+            <div class="step-circle">
+              3
+            </div>
+            <div class="step-label">
+              Submit
+            </div>
+          </div>
+        </div>
 
 
-                <p class="page-subtitle">
+        <!-- STEP 1 -->
+        <div class="step-panel active" data-panel="1">
+          <div class="panel-grid">
+            <div class="form-col">
+              <h3 class="form-heading">
+                Service Information
+              </h3>
+              <label class="field">
+                <span>
+                  Service Type
+                </span>
+                <select id="serviceTypeSelect">
+                  <option value="">Select service type</option>
+                  <option value="Residential">Residential</option>
+                  <option value="Commercial">Commercial</option>
+                </select>
+              </label>
 
-                    Professional air conditioning services to keep
-                    your home or business cool and comfortable
+              <label class="field">
+                <span>
+                  AC Unit Type
+                </span>
+                <select id="acUnitTypeSelect">
+                  <?php foreach ($unitTypes as $u): ?>
+                  <option value="<?= (int) $u['unit_type_id'] ?>"><?= e($u['name']) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </label>
 
-                </p>
-
+              <div class="field">
+                <span>
+                  Number of Units
+                </span>
+                <div class="qty">
+                  <button type="button" class="qty-btn" data-action="dec" aria-label="Decrease">
+                    &minus;
+                  </button>
+                  <input type="text" class="qty-input" id="qtyInput" value="1" inputmode="numeric" readonly>
+                  <button type="button" class="qty-btn" data-action="inc" aria-label="Increase">
+                    &plus;
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <section class="services-grid">
-
-                <!-- AC CLEANING -->
-                <article class="card">
-
-                    <img
-                        src="<?= BASE_URL ?>frontend/assets/img/couch.svg"
-                        alt="Bright living room with a grey sofa"
-                        class="card-img"
-                    >
-
-                    <div class="card-body">
-
-                        <h2>
-                            AC Cleaning
-                        </h2>
-
-                        <p class="desc">
-                            Keep your aircon clean and efficient with
-                            our professional cleaning service
-                        </p>
-
-                        <p class="includes">
-                            Services include:
-                        </p>
-
-                        <ul class="checklist">
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                General cleaning
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Filter cleaning
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Unit inspection
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Basic performance check
-                            </li>
-
-                        </ul>
-
-
-                        <div class="card-footer">
-
-                            <div class="price">
-
-                                <i class="fa-solid fa-tag"></i>
-
-                                <div>
-
-                                    <small>
-                                        Starting from
-                                    </small>
-
-                                    <strong>
-                                        ₱ 800
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="btn-request"
-                            >
-
-                                Request Service
-
-                                <i class="fa-solid fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-
-                <!-- AC REPAIR -->
-                <article class="card">
-
-                    <img
-                        src="<?= BASE_URL ?>frontend/assets/img/couch.svg"
-                        alt="Bright living room with a grey sofa"
-                        class="card-img"
-                    >
-
-                    <div class="card-body">
-
-                        <h2>
-                            AC Repair
-                        </h2>
-
-                        <p class="desc">
-                            We fix aircon problems quickly and efficiently
-                            to get your unit back in condition
-                        </p>
-
-                        <p class="includes">
-                            Services include:
-                        </p>
-
-                        <ul class="checklist">
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Diagnose the issue
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Repair faulty parts
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Test functionality
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Provide service report
-                            </li>
-
-                        </ul>
-
-
-                        <div class="card-footer">
-
-                            <div class="price">
-
-                                <i class="fa-solid fa-tag"></i>
-
-                                <div>
-
-                                    <small>
-                                        Starting from
-                                    </small>
-
-                                    <strong>
-                                        ₱ 1000
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="btn-request"
-                            >
-
-                                Request Service
-
-                                <i class="fa-solid fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-
-                <!-- AC MAINTENANCE -->
-                <article class="card">
-
-                    <img
-                        src="<?= BASE_URL ?>frontend/assets/img/couch.svg"
-                        alt="Bright living room with a grey sofa"
-                        class="card-img"
-                    >
-
-                    <div class="card-body">
-
-                        <h2>
-                            AC Maintenance
-                        </h2>
-
-                        <p class="desc">
-                            Prevent problems before they happen with
-                            our scheduled maintenance service
-                        </p>
-
-                        <p class="includes">
-                            Services include:
-                        </p>
-
-                        <ul class="checklist">
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Full system check
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Clean and inspect components
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Optimize performance
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Extend unit lifespan
-                            </li>
-
-                        </ul>
-
-
-                        <div class="card-footer">
-
-                            <div class="price">
-
-                                <i class="fa-solid fa-tag"></i>
-
-                                <div>
-
-                                    <small>
-                                        Starting from
-                                    </small>
-
-                                    <strong>
-                                        ₱ 1200
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="btn-request"
-                            >
-
-                                Request Service
-
-                                <i class="fa-solid fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-
-                <!-- AC INSTALLATION -->
-                <article class="card">
-
-                    <img
-                        src="<?= BASE_URL ?>frontend/assets/img/couch.svg"
-                        alt="Bright living room with a grey sofa"
-                        class="card-img"
-                    >
-
-                    <div class="card-body">
-
-                        <h2>
-                            AC Installation
-                        </h2>
-
-                        <p class="desc">
-                            Professional installation for your new
-                            aircon unit
-                        </p>
-
-                        <p class="includes">
-                            Services include:
-                        </p>
-
-                        <ul class="checklist">
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Site inspection
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Proper unit installation
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                System testing
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Warranty and support
-                            </li>
-
-                        </ul>
-
-
-                        <div class="card-footer">
-
-                            <div class="price">
-
-                                <i class="fa-solid fa-tag"></i>
-
-                                <div>
-
-                                    <small>
-                                        Starting from
-                                    </small>
-
-                                    <strong>
-                                        ₱ 800
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="btn-request"
-                            >
-
-                                Request Service
-
-                                <i class="fa-solid fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-
-                <!-- PARTS REPLACEMENT -->
-
-                <article class="card">
-
-                    <img
-                        src="<?= BASE_URL ?>frontend/assets/img/couch.svg"
-                        alt="Bright living room with a grey sofa"
-                        class="card-img"
-                    >
-
-                    <div class="card-body">
-
-                        <h2>
-                            Parts Replacement
-                        </h2>
-
-                        <p class="desc">
-                            Replace damaged parts with genuine and
-                            high-quality components
-                        </p>
-
-                        <p class="includes">
-                            Services include:
-                        </p>
-
-                        <ul class="checklist">
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Genuine parts
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Professional installation
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                System testing
-                            </li>
-
-                            <li>
-                                <i class="fa-solid fa-circle-check"></i>
-                                Warranty and replaced parts
-                            </li>
-
-                        </ul>
-
-
-                        <div class="card-footer">
-
-                            <div class="price">
-
-                                <i class="fa-solid fa-tag"></i>
-
-                                <div>
-
-                                    <small>
-                                        Starting from
-                                    </small>
-
-                                    <strong>
-                                        ₱ 800
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-
-                            <button
-                                type="button"
-                                class="btn-request"
-                            >
-
-                                Request Service
-
-                                <i class="fa-solid fa-chevron-right"></i>
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-            </section>
-
-        </main>
-
-    </div>
-
-</div>
-
-
-
-    <!-- REQUEST SERVICE MODAL -->
-
-
-<div
-    class="modal-overlay"
-    id="serviceModalOverlay"
->
-
-    <div
-        class="modal"
-        id="serviceModal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modalTitle"
-    >
-
-        <div class="modal-scroll">
-
-
-            <button
-                type="button"
-                class="modal-close"
-                id="modalCloseBtn"
-                aria-label="Close"
-            >
-
-                <i class="fa-solid fa-xmark"></i>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="modal-back"
-                id="modalBackBtn"
-            >
-
-                <i class="fa-solid fa-arrow-left"></i>
-
-                Back to Services
-
-            </button>
-
-
-            <h2
-                class="modal-title"
-                id="modalTitle"
-            >
-
-                Request
-                <span>Service</span>
-
-            </h2>
-
-
-            <p class="modal-subtitle">
-
-                Fill in the details below to request
-                your selected service
-
+            <div class="info-col">
+              <div class="info-art">
+                <img class="modalpic" src="<?= BASE_URL ?>frontend/assets/img/aircon.svg" alt="">
+              </div>
+              <div class="includes-box">
+                <p class="includes-title" id="includesTitle">
+                  Service Includes:
+                </p>
+                <ul class="includes-list" id="includesList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- STEP 2 -->
+        <div class="step-panel" data-panel="2">
+          <div class="schedule-grid">
+            <!-- SERVICE DETAILS SUMMARY -->
+            <div class="info-card">
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-screwdriver-wrench"></i>
+                  Service Details
+                </span>
+              </div>
+
+              <div class="service-summary" id="serviceSummary"></div>
+
+              <div class="summary-total">
+                <span>
+                  Estimated Total
+                </span>
+                <strong id="summaryTotal">
+                  &mdash;
+                </strong>
+              </div>
+            </div>
+
+            <!-- SCHEDULE -->
+            <div class="info-card">
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  Schedule
+                </span>
+              </div>
+
+              <label class="field">
+                <span>
+                  Preferred Date
+                </span>
+                <input type="date" id="preferredDate">
+              </label>
+
+              <label class="field">
+                <span>
+                  Preferred Time
+                </span>
+                <select id="preferredTime">
+                  <option value="">
+                    Select a time slot
+                  </option>
+                  <option>8:00 AM - 9:00 AM</option>
+                  <option>9:00 AM - 10:00 AM</option>
+                  <option>10:00 AM - 11:00 AM</option>
+                  <option>1:00 PM - 2:00 PM</option>
+                  <option>2:00 PM - 3:00 PM</option>
+                  <option>3:00 PM - 4:00 PM</option>
+                </select>
+              </label>
+            </div>
+
+            <!-- SERVICE ADDRESS -->
+            <div class="info-card">
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Service Address
+                </span>
+              </div>
+
+              <label class="field">
+                <span>
+                  Complete Address
+                </span>
+                <textarea id="serviceAddress" rows="4"
+                  placeholder="House/Unit No., Street, Barangay, City, Province"></textarea>
+
+              </label>
+            </div>
+          </div>
+
+          <div class="schedule-grid schedule-grid-2">
+            <!-- NOTE -->
+            <div class="info-card">
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-note-sticky"></i>
+                  Note
+                </span>
+              </div>
+
+              <label class="field">
+                <span>
+                  Description / Instructions
+                </span>
+                <textarea id="serviceNote" rows="3"
+                  placeholder="e.g. Please clean it and check if there are any issues with the unit. Thank you!"></textarea>
+              </label>
+            </div>
+
+
+            <!-- CONTACT -->
+            <div class="info-card">
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-address-card"></i>
+                  Contact
+                </span>
+              </div>
+
+              <label class="field">
+                <span>
+                  Full Name
+                </span>
+                <input type="text" id="contactName" placeholder="Juan Dela Cruz"
+                  value="<?= e($customer['full_name'] ?: $userName) ?>">
+              </label>
+
+              <label class="field">
+                <span>
+                  Phone Number
+                </span>
+                <input type="tel" id="contactPhone" placeholder="0999-999-9999" value="<?= e($customer['phone']) ?>">
+              </label>
+            </div>
+          </div>
+
+          <p class="field-error" id="step2Error" style="display:none;">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            Please fill in the date, time, address and contact
+            details before submitting.
+          </p>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step-panel" data-panel="3">
+          <div class="success-screen">
+            <div class="success-art">
+              <img class="Comppic" src="<?= BASE_URL ?>frontend/assets/img/complete.svg" alt="complete picture">
+            </div>
+            <h3 class="success-title">
+              Service Request Submitted!
+            </h3>
+            <p class="success-sub">
+              Your service request has been successfully
+              submitted. You will receive an update once
+              it's been reviewed by our team.
             </p>
 
+            <div class="success-summary">
+              <div class="success-summary-item">
+                <span>
+                  Request Number
+                </span>
+                <strong id="successRequestNumber">
+                  &mdash;
+                </strong>
+              </div>
 
-            <!-- STEPPER -->
-
-            <div class="stepper">
-
-                <div
-                    class="step active"
-                    data-step="1"
-                >
-
-                    <div class="step-circle">
-                        1
-                    </div>
-
-                    <div class="step-label">
-                        Service Details
-                    </div>
-
-                </div>
-
-
-                <div class="step-line"></div>
-
-
-                <div
-                    class="step"
-                    data-step="2"
-                >
-
-                    <div class="step-circle">
-                        2
-                    </div>
-
-                    <div class="step-label">
-                        Schedule &amp; Location
-                    </div>
-
-                </div>
-
-
-                <div class="step-line"></div>
-
-
-                <div
-                    class="step"
-                    data-step="3"
-                >
-
-                    <div class="step-circle">
-                        3
-                    </div>
-
-                    <div class="step-label">
-                        Submit
-                    </div>
-
-                </div>
-
+              <div class="success-summary-item">
+                <span>
+                  Estimated Total
+                </span>
+                <strong id="successTotal">
+                  &mdash;
+                </strong>
+              </div>
             </div>
 
-
-            <!-- STEP 1 -->
-
-            <div
-                class="step-panel active"
-                data-panel="1"
-            >
-
-                <div class="panel-grid">
-
-
-                    <div class="form-col">
-
-                        <h3 class="form-heading">
-                            Service Information
-                        </h3>
-
-
-                        <label class="field">
-
-                            <span>
-                                Service Type
-                            </span>
-
-                            <select id="serviceTypeSelect">
-
-                                <option>
-                                    Services Type
-                                </option>
-
-                                <option>
-                                    Residential
-                                </option>
-
-                                <option>
-                                    Commercial
-                                </option>
-
-                            </select>
-
-                        </label>
-
-
-                        <label class="field">
-
-                            <span>
-                                AC Unit Type
-                            </span>
-
-                            <select id="acUnitTypeSelect">
-
-                                <option>
-                                    Split Type
-                                </option>
-
-                                <option>
-                                    Window Type
-                                </option>
-
-                                <option>
-                                    Cassette Type
-                                </option>
-
-                                <option>
-                                    Portable Type
-                                </option>
-
-                            </select>
-
-                        </label>
-
-
-                        <div class="field">
-
-                            <span>
-                                Number of Units
-                            </span>
-
-                            <div class="qty">
-
-                                <button
-                                    type="button"
-                                    class="qty-btn"
-                                    data-action="dec"
-                                    aria-label="Decrease"
-                                >
-                                    &minus;
-                                </button>
-
-                                <input
-                                    type="text"
-                                    class="qty-input"
-                                    id="qtyInput"
-                                    value="1"
-                                    inputmode="numeric"
-                                    readonly
-                                >
-
-                                <button
-                                    type="button"
-                                    class="qty-btn"
-                                    data-action="inc"
-                                    aria-label="Increase"
-                                >
-                                    &plus;
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="info-col">
-
-                        <div class="info-art">
-
-                            <img
-                                class="modalpic"
-                                src="<?= BASE_URL ?>frontend/assets/img/aircon.svg"
-                                alt=""
-                            >
-
-                        </div>
-
-
-                        <div class="includes-box">
-
-                            <p
-                                class="includes-title"
-                                id="includesTitle"
-                            >
-                                Service Includes:
-                            </p>
-
-                            <ul
-                                class="includes-list"
-                                id="includesList"
-                            ></ul>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+            <div class="success-actions">
+              <a href="<?= BASE_URL ?>?page=request_main" class="btn-primary success-btn">
+                View My Request
+              </a>
+              <a href="<?= BASE_URL ?>?page=home_main" class="btn-outline success-btn">
+                Back to Home
+              </a>
             </div>
-
-
-            <!-- STEP 2 -->
-
-            <div
-                class="step-panel"
-                data-panel="2"
-            >
-
-                <div class="schedule-grid">
-
-
-                    <!-- SERVICE DETAILS SUMMARY -->
-
-                    <div class="info-card">
-
-                        <div class="info-card-head">
-
-                            <span class="info-card-title">
-
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-
-                                Service Details
-
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            class="service-summary"
-                            id="serviceSummary"
-                        ></div>
-
-
-                        <div class="summary-total">
-
-                            <span>
-                                Estimated Total
-                            </span>
-
-                            <strong id="summaryTotal">
-                                &mdash;
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- SCHEDULE -->
-
-                    <div class="info-card">
-
-                        <div class="info-card-head">
-
-                            <span class="info-card-title">
-
-                                <i class="fa-solid fa-calendar-days"></i>
-
-                                Schedule
-
-                            </span>
-
-                        </div>
-
-
-                        <label class="field">
-
-                            <span>
-                                Preferred Date
-                            </span>
-
-                            <input
-                                type="date"
-                                id="preferredDate"
-                            >
-
-                        </label>
-
-
-                        <label class="field">
-
-                            <span>
-                                Preferred Time
-                            </span>
-
-                            <select id="preferredTime">
-
-                                <option value="">
-                                    Select a time slot
-                                </option>
-
-                                <option>8:00 AM - 9:00 AM</option>
-                                <option>9:00 AM - 10:00 AM</option>
-                                <option>10:00 AM - 11:00 AM</option>
-                                <option>1:00 PM - 2:00 PM</option>
-                                <option>2:00 PM - 3:00 PM</option>
-                                <option>3:00 PM - 4:00 PM</option>
-
-                            </select>
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- SERVICE ADDRESS -->
-
-                    <div class="info-card">
-
-                        <div class="info-card-head">
-
-                            <span class="info-card-title">
-
-                                <i class="fa-solid fa-location-dot"></i>
-
-                                Service Address
-
-                            </span>
-
-                        </div>
-
-
-                        <label class="field">
-
-                            <span>
-                                Complete Address
-                            </span>
-
-                            <textarea
-                                id="serviceAddress"
-                                rows="4"
-                                placeholder="House/Unit No., Street, Barangay, City, Province"
-                            ></textarea>
-
-                        </label>
-
-                    </div>
-
-                </div>
-
-
-                <div class="schedule-grid schedule-grid-2">
-
-
-                    <!-- NOTE -->
-
-                    <div class="info-card">
-
-                        <div class="info-card-head">
-
-                            <span class="info-card-title">
-
-                                <i class="fa-solid fa-note-sticky"></i>
-
-                                Note
-
-                            </span>
-
-                        </div>
-
-
-                        <label class="field">
-
-                            <span>
-                                Description / Instructions
-                            </span>
-
-                            <textarea
-                                id="serviceNote"
-                                rows="3"
-                                placeholder="e.g. Please clean it and check if there are any issues with the unit. Thank you!"
-                            ></textarea>
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- CONTACT -->
-
-                    <div class="info-card">
-
-                        <div class="info-card-head">
-
-                            <span class="info-card-title">
-
-                                <i class="fa-solid fa-address-card"></i>
-
-                                Contact
-
-                            </span>
-
-                        </div>
-
-
-                        <label class="field">
-
-                            <span>
-                                Full Name
-                            </span>
-
-                            <input
-                                type="text"
-                                id="contactName"
-                                placeholder="Juan Dela Cruz"
-                            >
-
-                        </label>
-
-
-                        <label class="field">
-
-                            <span>
-                                Phone Number
-                            </span>
-
-                            <input
-                                type="tel"
-                                id="contactPhone"
-                                placeholder="0999-999-9999"
-                            >
-
-                        </label>
-
-                    </div>
-
-                </div>
-
-
-                <p
-                    class="field-error"
-                    id="step2Error"
-                    style="display:none;"
-                >
-
-                    <i class="fa-solid fa-circle-exclamation"></i>
-
-                    Please fill in the date, time, address and contact
-                    details before submitting.
-
-                </p>
-
-            </div>
-
-
-            <!-- STEP 3 -->
-
-            <div
-                class="step-panel"
-                data-panel="3"
-            >
-
-                <div class="success-screen">
-
-                    <div class="success-art">
-
-                        <img class="Comppic"
-                        src="<?= BASE_URL ?>frontend/assets/img/complete.svg"
-                        alt="complete picture"
-                    >
-
-                    </div>
-
-
-                    <h3 class="success-title">
-                        Service Request Submitted!
-                    </h3>
-
-                    <p class="success-sub">
-                        Your service request has been successfully
-                        submitted. You will receive an update once
-                        it's been reviewed by our team.
-                    </p>
-
-
-                    <div class="success-summary">
-
-                        <div class="success-summary-item">
-
-                            <span>
-                                Request Number
-                            </span>
-
-                            <strong id="successRequestNumber">
-                                &mdash;
-                            </strong>
-
-                        </div>
-
-
-                        <div class="success-summary-item">
-
-                            <span>
-                                Estimated Total
-                            </span>
-
-                            <strong id="successTotal">
-                                &mdash;
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="success-actions">
-
-                        <a
-                            href="requests.php"
-                            class="btn-primary success-btn"
-                        >
-                            View My Request
-                        </a>
-
-                        <a
-                            href="index.php"
-                            class="btn-outline success-btn"
-                        >
-                            Back to Home
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+          </div>
         </div>
+      </div>
 
-
-        <!-- MODAL FOOTER -->
-
-        <div class="modal-footer">
-
-            <button
-                type="button"
-                class="btn-outline"
-                id="btnStepBack"
-                style="display:none;"
-            >
-                Previous
-            </button>
-
-
-            <div class="footer-actions">
-
-                <button
-                    type="button"
-                    class="btn-outline"
-                    id="btnScheduleService"
-                >
-                    Schedule Service
-                </button>
-
-
-                <button
-                    type="button"
-                    class="btn-primary"
-                    id="btnAddCart"
-                >
-                    Add to Service Cart
-                </button>
-
-
-                <button
-                    type="button"
-                    class="btn-primary"
-                    id="btnStepNext"
-                    style="display:none;"
-                >
-                    Submit Request
-
-                    <i class="fa-solid fa-paper-plane"></i>
-                </button>
-
-            </div>
-
+      <!-- MODAL FOOTER -->
+      <div class="modal-footer">
+        <button type="button" class="btn-outline" id="btnStepBack" style="display:none;">
+          Previous
+        </button>
+        <div class="footer-actions">
+          <button type="button" class="btn-outline" id="btnScheduleService">
+            Schedule Service
+          </button>
+          <button type="button" class="btn-primary" id="btnAddCart">
+            Add to Service Cart
+          </button>
+          <button type="button" class="btn-primary" id="btnStepNext" style="display:none;">
+            Submit Request
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
         </div>
-
+      </div>
     </div>
+  </div>
 
-</div>
 
-
-<!-- =========================================================
+  <!-- =========================================================
      JAVASCRIPT
 ========================================================= -->
-
-<script>
-
-(function () {
+  <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
+  <script>
+  (function() {
 
     var menuButton = document.getElementById('menuButton');
     var sidebar = document.getElementById('sidebar');
@@ -1214,161 +674,161 @@ function e($value)
 
     function setOpen(open) {
 
-        sidebar.classList.toggle('open', open);
+      sidebar.classList.toggle('open', open);
 
-        overlay.classList.toggle('open', open);
+      overlay.classList.toggle('open', open);
 
-        menuButton.setAttribute(
-            'aria-expanded',
-            open ? 'true' : 'false'
-        );
+      menuButton.setAttribute(
+        'aria-expanded',
+        open ? 'true' : 'false'
+      );
 
     }
 
 
     if (menuButton && sidebar && overlay) {
 
-        menuButton.addEventListener('click', function () {
+      menuButton.addEventListener('click', function() {
 
-            setOpen(
-                !sidebar.classList.contains('open')
-            );
+        setOpen(
+          !sidebar.classList.contains('open')
+        );
 
-        });
-
-
-        overlay.addEventListener('click', function () {
-
-            setOpen(false);
-
-        });
+      });
 
 
-        sidebar
-            .querySelectorAll('.menu-link')
-            .forEach(function (link) {
+      overlay.addEventListener('click', function() {
 
-                link.addEventListener('click', function () {
+        setOpen(false);
 
-                    if (
-                        window.matchMedia(
-                            '(max-width: 900px)'
-                        ).matches
-                    ) {
-
-                        setOpen(false);
-
-                    }
-
-                });
-
-            });
+      });
 
 
-        window.addEventListener('resize', function () {
+      sidebar
+        .querySelectorAll('.menu-link')
+        .forEach(function(link) {
+
+          link.addEventListener('click', function() {
 
             if (
-                !window.matchMedia(
-                    '(max-width: 900px)'
-                ).matches
+              window.matchMedia(
+                '(max-width: 900px)'
+              ).matches
             ) {
 
-                setOpen(false);
+              setOpen(false);
 
             }
 
+          });
+
         });
+
+
+      window.addEventListener('resize', function() {
+
+        if (
+          !window.matchMedia(
+            '(max-width: 900px)'
+          ).matches
+        ) {
+
+          setOpen(false);
+
+        }
+
+      });
 
     }
 
-})();
+  })();
 
 
 
-/* =========================================================
-   REQUEST SERVICE MODAL
-========================================================= */
+  /* =========================================================
+     REQUEST SERVICE MODAL
+  ========================================================= */
 
-(function () {
-
+  (function() {
+    var API_URL = '<?= BASE_URL ?>backend/api/';
     var overlay =
-        document.getElementById('serviceModalOverlay');
+      document.getElementById('serviceModalOverlay');
 
     var modal =
-        document.getElementById('serviceModal');
+      document.getElementById('serviceModal');
 
     var modalTitle =
-        document.getElementById('modalTitle');
+      document.getElementById('modalTitle');
 
     var includesTitle =
-        document.getElementById('includesTitle');
+      document.getElementById('includesTitle');
 
     var includesList =
-        document.getElementById('includesList');
+      document.getElementById('includesList');
 
     var qtyInput =
-        document.getElementById('qtyInput');
+      document.getElementById('qtyInput');
 
     var acUnitTypeSelect =
-        document.getElementById('acUnitTypeSelect');
+      document.getElementById('acUnitTypeSelect');
 
     var serviceTypeSelect =
-        document.getElementById('serviceTypeSelect');
+      document.getElementById('serviceTypeSelect');
 
 
     var serviceSummary =
-        document.getElementById('serviceSummary');
+      document.getElementById('serviceSummary');
 
     var summaryTotal =
-        document.getElementById('summaryTotal');
+      document.getElementById('summaryTotal');
 
     var preferredDate =
-        document.getElementById('preferredDate');
+      document.getElementById('preferredDate');
 
     var preferredTime =
-        document.getElementById('preferredTime');
+      document.getElementById('preferredTime');
 
     var serviceAddress =
-        document.getElementById('serviceAddress');
+      document.getElementById('serviceAddress');
 
     var serviceNote =
-        document.getElementById('serviceNote');
+      document.getElementById('serviceNote');
 
     var contactName =
-        document.getElementById('contactName');
+      document.getElementById('contactName');
 
     var contactPhone =
-        document.getElementById('contactPhone');
+      document.getElementById('contactPhone');
 
     var step2Error =
-        document.getElementById('step2Error');
+      document.getElementById('step2Error');
 
     var successRequestNumber =
-        document.getElementById('successRequestNumber');
+      document.getElementById('successRequestNumber');
 
     var successTotal =
-        document.getElementById('successTotal');
+      document.getElementById('successTotal');
 
 
     var btnStepBack =
-        document.getElementById('btnStepBack');
+      document.getElementById('btnStepBack');
 
     var btnScheduleService =
-        document.getElementById('btnScheduleService');
+      document.getElementById('btnScheduleService');
 
     var btnAddCart =
-        document.getElementById('btnAddCart');
+      document.getElementById('btnAddCart');
 
     var btnStepNext =
-        document.getElementById('btnStepNext');
+      document.getElementById('btnStepNext');
 
 
     var currentStep = 1;
 
     var currentService = {
-        name: '',
-        price: '',
-        includes: []
+      name: '',
+      price: '',
+      includes: []
     };
 
     var lastFocused = null;
@@ -1376,518 +836,539 @@ function e($value)
 
     function openModal(card) {
 
-        var name =
-            card.querySelector('h2')
-                .textContent
-                .trim();
+      var name =
+        card.querySelector('h2')
+        .textContent
+        .trim();
 
 
-        var priceEl =
-            card.querySelector('.price strong');
+      var priceEl =
+        card.querySelector('.price strong');
 
 
-        var price =
-            priceEl
-                ? priceEl.textContent.trim()
-                : '';
+      var price =
+        priceEl ?
+        priceEl.textContent.trim() :
+        '';
 
 
-        var items =
-            Array.prototype.map.call(
-                card.querySelectorAll(
-                    '.checklist li'
-                ),
-                function (li) {
+      var items =
+        Array.prototype.map.call(
+          card.querySelectorAll(
+            '.checklist li'
+          ),
+          function(li) {
 
-                    return li.textContent.trim();
+            return li.textContent.trim();
 
-                }
-            );
-
-
-        currentService = {
-            name: name,
-            price: price,
-            includes: items
-        };
+          }
+        );
 
 
-        modalTitle.innerHTML =
-            'Request <span>' +
-            name +
-            '</span>';
+      // currentService = {
+      //   name: name,
+      //   price: price,
+      //   includes: items
+      // };
+      currentService = {
+        id: card.getAttribute('data-service-id'),
+        name: name,
+        price: price,
+        includes: items
+      };
 
 
-        includesTitle.textContent =
-            name + ' Includes:';
+      modalTitle.innerHTML =
+        'Request <span>' +
+        name +
+        '</span>';
 
 
-        includesList.innerHTML =
-            items.map(function (item) {
-
-                return (
-                    '<li>' +
-                    '<i class="fa-solid fa-circle-check"></i>' +
-                    item +
-                    '</li>'
-                );
-
-            }).join('');
+      includesTitle.textContent =
+        name + ' Includes:';
 
 
-        qtyInput.value = '1';
+      includesList.innerHTML =
+        items.map(function(item) {
 
-        acUnitTypeSelect.selectedIndex = 0;
+          return (
+            '<li>' +
+            '<i class="fa-solid fa-circle-check"></i>' +
+            item +
+            '</li>'
+          );
 
-        resetStep2Fields();
-
-
-        lastFocused =
-            document.activeElement;
-
-
-        goToStep(1);
-
-
-        overlay.classList.add('open');
-
-        document.body.style.overflow =
-            'hidden';
+        }).join('');
 
 
-        document
-            .getElementById('modalCloseBtn')
-            .focus();
+      qtyInput.value = '1';
+
+      acUnitTypeSelect.selectedIndex = 0;
+      serviceTypeSelect.selectedIndex = 0;
+
+      resetStep2Fields();
+
+
+      lastFocused =
+        document.activeElement;
+
+
+      goToStep(1);
+
+
+      overlay.classList.add('open');
+
+      document.body.style.overflow =
+        'hidden';
+
+
+      document
+        .getElementById('modalCloseBtn')
+        .focus();
 
     }
 
 
     function closeModal() {
 
-        overlay.classList.remove('open');
+      overlay.classList.remove('open');
 
-        document.body.style.overflow = '';
+      document.body.style.overflow = '';
 
 
-        if (lastFocused) {
+      if (lastFocused) {
 
-            lastFocused.focus();
+        lastFocused.focus();
 
-        }
+      }
 
     }
 
 
     function goToStep(n) {
 
-        currentStep = n;
+      currentStep = n;
 
 
-        document
-            .querySelectorAll('.step')
-            .forEach(function (s) {
+      document
+        .querySelectorAll('.step')
+        .forEach(function(s) {
 
-                var step =
-                    parseInt(
-                        s.getAttribute('data-step'),
-                        10
-                    );
-
-
-                s.classList.toggle(
-                    'active',
-                    step === n
-                );
+          var step =
+            parseInt(
+              s.getAttribute('data-step'),
+              10
+            );
 
 
-                s.classList.toggle(
-                    'done',
-                    step < n
-                );
-
-            });
+          s.classList.toggle(
+            'active',
+            step === n
+          );
 
 
-        document
-            .querySelectorAll('.step-line')
-            .forEach(function (line, idx) {
+          s.classList.toggle(
+            'done',
+            step < n
+          );
 
-                line.classList.toggle(
-                    'done',
-                    idx + 1 < n
-                );
-
-            });
+        });
 
 
-        document
-            .querySelectorAll('.step-panel')
-            .forEach(function (p) {
+      document
+        .querySelectorAll('.step-line')
+        .forEach(function(line, idx) {
 
-                p.classList.toggle(
-                    'active',
-                    parseInt(
-                        p.getAttribute('data-panel'),
-                        10
-                    ) === n
-                );
+          line.classList.toggle(
+            'done',
+            idx + 1 < n
+          );
 
-            });
+        });
 
 
-        var footer =
-            modal.querySelector('.modal-footer');
+      document
+        .querySelectorAll('.step-panel')
+        .forEach(function(p) {
+
+          p.classList.toggle(
+            'active',
+            parseInt(
+              p.getAttribute('data-panel'),
+              10
+            ) === n
+          );
+
+        });
 
 
-        footer.classList.toggle(
-            'has-back',
-            n === 2
-        );
+      var footer =
+        modal.querySelector('.modal-footer');
 
 
-        footer.classList.toggle(
-            'hidden',
-            n === 3
-        );
+      footer.classList.toggle(
+        'has-back',
+        n === 2
+      );
 
 
-        btnStepBack.style.display =
-            n === 2
-                ? 'inline-flex'
-                : 'none';
+      footer.classList.toggle(
+        'hidden',
+        n === 3
+      );
 
 
-        btnScheduleService.style.display =
-            n === 1
-                ? 'inline-flex'
-                : 'none';
+      btnStepBack.style.display =
+        n === 2 ?
+        'inline-flex' :
+        'none';
 
 
-        btnAddCart.style.display =
-            n === 1
-                ? 'inline-flex'
-                : 'none';
+      btnScheduleService.style.display =
+        n === 1 ?
+        'inline-flex' :
+        'none';
 
 
-        btnStepNext.style.display =
-            n === 2
-                ? 'inline-flex'
-                : 'none';
+      btnAddCart.style.display =
+        n === 1 ?
+        'inline-flex' :
+        'none';
 
 
-        if (n === 2) {
+      btnStepNext.style.display =
+        n === 2 ?
+        'inline-flex' :
+        'none';
 
-            populateStep2Summary();
 
-        }
+      if (n === 2) {
+
+        populateStep2Summary();
+
+      }
 
 
-        modal
-            .querySelector('.modal-scroll')
-            .scrollTop = 0;
+      modal
+        .querySelector('.modal-scroll')
+        .scrollTop = 0;
 
     }
 
 
     function parsePrice(priceText) {
 
-        var digits =
-            (priceText || '').replace(/[^\d]/g, '');
+      var digits =
+        (priceText || '').replace(/[^\d]/g, '');
 
 
-        return digits
-            ? parseInt(digits, 10)
-            : 0;
+      return digits ?
+        parseInt(digits, 10) :
+        0;
 
     }
 
 
     function formatPeso(amount) {
 
-        return '\u20B1 ' +
-            amount.toLocaleString('en-PH');
+      return '\u20B1 ' +
+        amount.toLocaleString('en-PH');
 
     }
 
 
     function populateStep2Summary() {
 
-        var qty =
-            parseInt(qtyInput.value, 10) || 1;
+      var qty =
+        parseInt(qtyInput.value, 10) || 1;
 
-        var unitPrice =
-            parsePrice(currentService.price);
+      var unitPrice =
+        parsePrice(currentService.price);
 
-        var total =
-            unitPrice * qty;
-
-
-        serviceSummary.innerHTML =
-
-            '<div class="summary-item">' +
-                '<span>Service</span>' +
-                '<strong>' + currentService.name + '</strong>' +
-            '</div>' +
-
-            '<div class="summary-item">' +
-                '<span>Service Type</span>' +
-                '<strong>' + serviceTypeSelect.value + '</strong>' +
-            '</div>' +
-
-            '<div class="summary-item">' +
-                '<span>AC Unit Type</span>' +
-                '<strong>' + acUnitTypeSelect.value + '</strong>' +
-            '</div>' +
-
-            '<div class="summary-item">' +
-                '<span>Number of Units</span>' +
-                '<strong>' + qty + '</strong>' +
-            '</div>';
+      var total =
+        unitPrice * qty;
 
 
-        summaryTotal.textContent =
-            formatPeso(total);
+      serviceSummary.innerHTML =
+
+        '<div class="summary-item">' +
+        '<span>Service</span>' +
+        '<strong>' + currentService.name + '</strong>' +
+        '</div>' +
+
+        '<div class="summary-item">' +
+        '<span>Service Type</span>' +
+        '<strong>' + serviceTypeSelect.value + '</strong>' +
+        '</div>' +
+
+        '<div class="summary-item">' +
+        '<span>AC Unit Type</span>' +
+        '<strong>' + acUnitTypeSelect.options[acUnitTypeSelect.selectedIndex].text + '</strong>' +
+        '</div>' +
+
+        '<div class="summary-item">' +
+        '<span>Number of Units</span>' +
+        '<strong>' + qty + '</strong>' +
+        '</div>';
+
+
+      summaryTotal.textContent =
+        formatPeso(total);
 
     }
 
 
     function resetStep2Fields() {
 
-        preferredDate.value = '';
+      preferredDate.value = '';
 
-        preferredTime.value = '';
+      preferredTime.value = '';
 
-        serviceAddress.value = '';
+      serviceAddress.value = '';
 
-        serviceNote.value = '';
+      serviceNote.value = '';
 
-        contactName.value = '';
+      contactName.value = contactName.defaultValue;
 
-        contactPhone.value = '';
+      contactPhone.value = contactPhone.defaultValue;
 
-        step2Error.style.display = 'none';
-
-    }
-
-
-    function generateRequestNumber() {
-
-        var randomPart =
-            Math.floor(
-                Math.random() * 1000000
-            ).toString().padStart(6, '0');
-
-
-        return 'SR-' + randomPart;
+      step2Error.style.display = 'none';
 
     }
 
+    //Deleted
+    // function generateRequestNumber() {
+
+    //   var randomPart =
+    //     Math.floor(
+    //       Math.random() * 1000000
+    //     ).toString().padStart(6, '0');
+
+
+    //   return 'SR-' + randomPart;
+
+    // }
+
+
+    var step2Default = step2Error.innerHTML;
 
     function submitRequest() {
+      var isValid =
+        preferredDate.value &&
+        preferredTime.value &&
+        serviceAddress.value.trim() &&
+        contactName.value.trim() &&
+        contactPhone.value.trim();
 
-        var isValid =
-            preferredDate.value &&
-            preferredTime.value &&
-            serviceAddress.value.trim() &&
-            contactName.value.trim() &&
-            contactPhone.value.trim();
+      if (!isValid) {
+        step2Error.innerHTML = step2Default;
+        step2Error.style.display = 'flex';
+        return;
+      }
+      step2Error.style.display = 'none';
+      btnStepNext.disabled = true;
 
-
-        if (!isValid) {
-
-            step2Error.style.display = 'flex';
-
-            return;
-
+      cfPost(API_URL + 'requests.php', {
+        action: 'create',
+        source: 'direct',
+        service_id: currentService.id,
+        unit_type_id: acUnitTypeSelect.value,
+        customer_type: serviceTypeSelect.value,
+        quantity: parseInt(qtyInput.value, 10) || 1,
+        preferred_date: preferredDate.value,
+        preferred_time: preferredTime.value,
+        service_address: serviceAddress.value.trim(),
+        notes: serviceNote.value.trim(),
+        contact_name: contactName.value.trim(),
+        contact_phone: contactPhone.value.trim()
+      }).then(function(res) {
+        btnStepNext.disabled = false;
+        if (!res.success) {
+          step2Error.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + cfEscape(cfFirstError(res));
+          step2Error.style.display = 'flex';
+          return;
         }
-
-
-        step2Error.style.display = 'none';
-
-
-        var qty =
-            parseInt(qtyInput.value, 10) || 1;
-
-        var total =
-            parsePrice(currentService.price) * qty;
-
-
-        successRequestNumber.textContent =
-            generateRequestNumber();
-
-        successTotal.textContent =
-            formatPeso(total);
-
-
+        successRequestNumber.textContent = res.request_number;
+        successTotal.textContent = formatPeso(res.estimated_total);
         goToStep(3);
-
+      });
     }
 
 
     document
-        .querySelectorAll('.btn-request')
-        .forEach(function (btn) {
+      .querySelectorAll('.btn-request')
+      .forEach(function(btn) {
 
-            btn.addEventListener(
-                'click',
-                function () {
+        btn.addEventListener(
+          'click',
+          function() {
 
-                    var card =
-                        btn.closest('.card');
+            var card =
+              btn.closest('.card');
 
-                    if (card) {
+            if (card) {
 
-                        openModal(card);
-
-                    }
-
-                }
-            );
-
-        });
-
-
-    document
-        .getElementById('modalCloseBtn')
-        .addEventListener(
-            'click',
-            closeModal
-        );
-
-
-    document
-        .getElementById('modalBackBtn')
-        .addEventListener(
-            'click',
-            closeModal
-        );
-
-
-    overlay.addEventListener(
-        'click',
-        function (e) {
-
-            if (e.target === overlay) {
-
-                closeModal();
+              openModal(card);
 
             }
 
+          }
+        );
+
+      });
+
+
+    document
+      .getElementById('modalCloseBtn')
+      .addEventListener(
+        'click',
+        closeModal
+      );
+
+
+    document
+      .getElementById('modalBackBtn')
+      .addEventListener(
+        'click',
+        closeModal
+      );
+
+
+    overlay.addEventListener(
+      'click',
+      function(e) {
+
+        if (e.target === overlay) {
+
+          closeModal();
+
         }
+
+      }
     );
 
 
     document.addEventListener(
-        'keydown',
-        function (e) {
+      'keydown',
+      function(e) {
 
-            if (
-                e.key === 'Escape' &&
-                overlay.classList.contains('open')
-            ) {
+        if (
+          e.key === 'Escape' &&
+          overlay.classList.contains('open')
+        ) {
 
-                closeModal();
-
-            }
+          closeModal();
 
         }
+
+      }
     );
 
 
     document
-        .querySelectorAll('.qty-btn')
-        .forEach(function (b) {
+      .querySelectorAll('.qty-btn')
+      .forEach(function(b) {
 
-            b.addEventListener(
-                'click',
-                function () {
+        b.addEventListener(
+          'click',
+          function() {
 
-                    var val =
-                        parseInt(
-                            qtyInput.value,
-                            10
-                        ) || 1;
-
-
-                    if (
-                        b.getAttribute(
-                            'data-action'
-                        ) === 'inc'
-                    ) {
-
-                        val += 1;
-
-                    } else {
-
-                        val =
-                            Math.max(
-                                1,
-                                val - 1
-                            );
-
-                    }
+            var val =
+              parseInt(
+                qtyInput.value,
+                10
+              ) || 1;
 
 
-                    qtyInput.value = val;
+            if (
+              b.getAttribute(
+                'data-action'
+              ) === 'inc'
+            ) {
 
-                }
-            );
+              val += 1;
 
-        });
+            } else {
+
+              val =
+                Math.max(
+                  1,
+                  val - 1
+                );
+
+            }
 
 
-    btnScheduleService.addEventListener(
-        'click',
-        function () {
+            qtyInput.value = val;
 
-            goToStep(2);
+          }
+        );
 
-        }
-    );
+      });
+
+
+    btnScheduleService.addEventListener('click', function() {
+      if (!serviceTypeSelect.value) {
+        alert('Please choose Residential or Commercial.');
+        serviceTypeSelect.focus();
+        return;
+      }
+      goToStep(2);
+    });
 
 
     btnStepBack.addEventListener(
-        'click',
-        function () {
+      'click',
+      function() {
 
-            goToStep(
-                Math.max(
-                    1,
-                    currentStep - 1
-                )
-            );
+        goToStep(
+          Math.max(
+            1,
+            currentStep - 1
+          )
+        );
 
-        }
+      }
     );
 
 
     btnStepNext.addEventListener(
-        'click',
-        function () {
+      'click',
+      function() {
 
-            submitRequest();
+        submitRequest();
 
-        }
+      }
     );
 
 
-    btnAddCart.addEventListener(
-        'click',
-        function () {
-
-            closeModal();
-
-            alert(
-                currentService.name +
-                ' added to your Service Cart.'
-            );
-
+    btnAddCart.addEventListener('click', function() {
+      if (!serviceTypeSelect.value) {
+        alert('Please choose Residential or Commercial.');
+        serviceTypeSelect.focus();
+        return;
+      }
+      btnAddCart.disabled = true;
+      cfPost(API_URL + 'cart.php', {
+        action: 'add',
+        service_id: currentService.id,
+        unit_type_id: acUnitTypeSelect.value,
+        customer_type: serviceTypeSelect.value,
+        quantity: parseInt(qtyInput.value, 10) || 1
+      }).then(function(res) {
+        btnAddCart.disabled = false;
+        if (!res.success) {
+          alert(cfFirstError(res));
+          return;
         }
-    );
+        closeModal();
+        alert(currentService.name + ' added to your Service Cart.');
+      });
+    });
 
-})();
-
-</script>
+  })();
+  </script>
 
 </body>
+
 </html>

@@ -20,12 +20,12 @@ if (!empty($_SESSION['login_locked_until']) && time() < $_SESSION['login_locked_
     respond(['success' => false, 'message' => 'Too many attempts. Please try again in a few minutes.'], 429);
 }
 
-$email    = strtolower(trim($_POST['email'] ?? ''));
+$login    = trim($_POST['login'] ?? '');
 $password = $_POST['password'] ?? '';
 
 $errors = [];
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors['email'] = 'Enter a valid email address.';
+if ($login === '' || strlen($login) > 100) {
+    $errors['login'] = 'Enter your username or email address.';
 }
 if ($password === '') {
     $errors['password'] = 'Enter your password.';
@@ -35,7 +35,7 @@ if ($errors) {
 }
 
 try {
-    $customer = customer_find_by_email($conn, $email);
+    $customer = customer_find_by_login($conn, $login);
 
     if ($customer) {
         $valid = password_verify($password, $customer['password_hash']);
@@ -51,8 +51,15 @@ try {
             $_SESSION['login_attempts'] = 0;
         }
         // Same message for wrong email or wrong password
-        respond(['success' => false, 'message' => 'Invalid email or password.'], 401);
+        respond(['success' => false, 'message' => 'Invalid username/email or password.'], 401);
     }
+
+    // Correct password, but deactivated. Only revealed after the password matches,
+    // so it can't be used to discover which accounts exist.
+    if ((int) $customer['is_active'] !== 1) {
+        respond(['success' => false, 'message' => 'This account has been deactivated. Please contact support.'], 403);
+    }
+
 
     // Success
     session_regenerate_id(true);   // prevents session fixation

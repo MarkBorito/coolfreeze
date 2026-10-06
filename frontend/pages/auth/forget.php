@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Forgot Password | CoolFreeze</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="<?= BASE_URL . 'frontend/assets/css/font-style.css' ?>">
+  <link rel="stylesheet" href="<?= BASE_URL . 'frontend/assets/css/font-style.css' ?>">
 </head>
 
 <!-- h-dvh + overflow-hidden: the page is exactly one screen tall and never scrolls -->
+
 <body class="h-dvh overflow-hidden bg-white text-gray-900 antialiased">
 
   <div class="flex h-full flex-col md:flex-row">
@@ -20,11 +22,9 @@
         <!-- Top: brand (mobile only) + back button -->
         <div>
           <h2 class="mb-4 text-xl font-bold text-blue-600 md:hidden">COOLFREEZE</h2>
-          <a
-            href="<?= BASE_URL ?>?page=login"
+          <a href="<?= BASE_URL ?>?page=login"
             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100"
-            aria-label="Back"
-          >
+            aria-label="Back">
             <img class="h-4 w-4" src="<?= BASE_URL . 'frontend/assets/img/back-arrow.svg' ?>" alt="">
           </a>
         </div>
@@ -39,49 +39,37 @@
             Enter your email address and we'll send you a link to reset your password.
           </p>
 
-          <form class="mt-6 space-y-4" method="post" action="">
+          <div id="form-message" class="hidden"></div>
 
+          <form id="forgot-form" class="mt-6 space-y-4" method="post"
+            action="<?= BASE_URL . 'backend/api/forgot-password.php' ?>" novalidate>
             <div>
               <label for="email" class="mb-1 block text-sm font-bold">Email Address</label>
 
               <div class="relative">
                 <!-- Mail icon -->
-                <svg
-                  class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
-                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  aria-hidden="true"
-                >
+                <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500"
+                  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                   <path d="m22 7-10 6L2 7"></path>
                 </svg>
 
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  autocomplete="email"
-                  required
+                <input type="email" id="email" name="email" autocomplete="email" required
                   class="w-full rounded-md border border-blue-100 bg-blue-50 py-2.5 pl-10 pr-3 text-base outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your email address"
-                >
+                  placeholder="Enter your email address">
               </div>
+              <p class="field-error mt-1 hidden text-xs text-red-600" data-for="email"></p>
             </div>
 
             <div class="flex items-center gap-2 text-sm">
-              <input
-                class="h-4 w-4 shrink-0 rounded border-gray-300 accent-blue-600"
-                type="checkbox"
-                id="remember"
-                name="remember"
-              >
+              <input class="h-4 w-4 shrink-0 rounded border-gray-300 accent-blue-600" type="checkbox" id="remember"
+                name="remember">
               <label for="remember">Remember me</label>
             </div>
 
-            <button
-              type="submit"
-              class="w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
+            <button type="submit"
+              class="w-full cursor-pointer rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
               Send Code
             </button>
           </form>
@@ -101,11 +89,8 @@
 
     <!-- RIGHT SIDE: image (hidden on mobile, shown from md and up) -->
     <div class="relative hidden h-full overflow-hidden md:block md:w-1/2">
-      <img
-        src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
-        class="absolute inset-0 h-full w-full object-cover -scale-x-100"
-        alt=""
-      >
+      <img src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
+        class="absolute inset-0 h-full w-full object-cover -scale-x-100" alt="">
 
       <!-- Right-aligned text in the top part of the panel, above the aircon in the image -->
       <div class="absolute right-0 top-0 flex max-w-full flex-col items-end p-6 text-right lg:p-10">
@@ -123,5 +108,57 @@
 
   </div>
 
+  <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
+  <script>
+  (function() {
+    var form = document.getElementById('forgot-form');
+    var msg = document.getElementById('form-message');
+    var btn = form.querySelector('button[type="submit"]');
+
+    function show(text, ok) {
+      msg.className = 'mt-4 rounded-md p-3 text-sm ' + (ok ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700');
+      msg.textContent = text;
+    }
+
+    function clearErrors() {
+      msg.className = 'hidden';
+      document.querySelectorAll('.field-error').forEach(function(p) {
+        p.classList.add('hidden');
+        p.textContent = '';
+      });
+    }
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      cfPost(form.action, new FormData(form)).then(function(res) {
+        if (res.success) {
+          show(res.message, true);
+          setTimeout(function() {
+            window.location.replace(res.redirect);
+          }, 900);
+          return;
+        }
+        if (res.errors) {
+          Object.keys(res.errors).forEach(function(f) {
+            var p = document.querySelector('.field-error[data-for="' + f + '"]');
+            if (p) {
+              p.textContent = res.errors[f];
+              p.classList.remove('hidden');
+            }
+          });
+        } else {
+          show(res.message, false);
+        }
+        btn.disabled = false;
+        btn.textContent = 'Send Code';
+      });
+    });
+  })();
+  </script>
+
 </body>
+
 </html>
