@@ -1,33 +1,34 @@
 <?php
-
-
 // Start here. Change 
 require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
+require_once BACKEND_PATH . '/helpers/guard.php';
+require_once BACKEND_PATH . '/models/service.php';
+require_once BACKEND_PATH . '/models/request.php';
 
 // Log in name ng customer: example - markesg
 $userName = $_SESSION['username'] ?? 'Customer';
 $currentPage = 'home';
 
 
-// Services 
-$services = [
-    ['id' => 1, 'title' => 'AC Cleaning', 'description' => 'Keep your AC clean and efficient', 'icon' => 'fa-fan'],
-    ['id' => 2, 'title' => 'AC Repair', 'description' => 'Fix your AC problems quickly', 'icon' => 'fa-screwdriver-wrench'],
-    ['id' => 3, 'title' => 'AC Maintenance', 'description' => 'Prevents Problems', 'icon' => 'fa-gear'],
-    ['id' => 4, 'title' => 'AC Installation', 'description' => 'Installation for your new AC', 'icon' => 'fa-wind'],
-    ['id' => 5, 'title' => 'Parts Replacements', 'description' => 'Replace Damaged Parts', 'icon' => 'fa-toolbox'],
-];
+$services = array_map(function ($s) {
+    return [
+        'id'          => (int) $s['service_id'],
+        'title'       => $s['name'],
+        'description' => mb_strimwidth((string) $s['description'], 0, 60, '…'),
+        'icon'        => $s['icon'] ?: 'fa-fan',
+    ];
+}, service_all_active($conn));
 
-// Temporary request data
-// Status values: Pending | Confirmed | On going | Cancelled
-$recentRequests = [
-    ['id' => 125, 'service' => 'Parts Replacement', 'date' => 'September 26, 2025', 'status' => 'Pending'],
-    ['id' => 124, 'service' => 'AC Cleaning', 'date' => 'September 26, 2025', 'status' => 'Confirmed'],
-    ['id' => 123, 'service' => 'AC Cleaning', 'date' => 'Sep 15, 2025', 'status' => 'On going'],
-    ['id' => 122, 'service' => 'AC Cleaning', 'date' => 'Sep 15, 2025', 'status' => 'Cancelled'],
-];
-
-$totalRequests = count($recentRequests); 
+$allRequests    = request_list_for_customer($conn, (int) $_SESSION['customer_id']);
+$totalRequests  = count($allRequests);
+$recentRequests = array_map(function ($r) {
+    return [
+        'id'      => (int) $r['request_id'],
+        'service' => $r['service_names'],
+        'date'    => date('M j, Y', strtotime($r['submitted_at'])),
+        'status'  => $r['status'],
+    ];
+}, array_slice($allRequests, 0, 4));
 
 // AC Care Tips 
 $careTips = [
@@ -50,20 +51,20 @@ function statusClass($status)
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoolFreeze | Homepage</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoolFreeze | Homepage</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="layout">
+  <div class="layout">
     <!-- Sidebar -->
     <?php require FRONTEND_PATH . 'includes/sidebar.php' ?>
 
@@ -72,195 +73,192 @@ function statusClass($status)
 
     <!-- MAIN CONTENT -->
     <div class="main">
-        <!-- Topbar -->
-        <?php require FRONTEND_PATH . 'includes/topbar.php'?>
+      <!-- Topbar -->
+      <?php require FRONTEND_PATH . 'includes/topbar.php'?>
 
-        <!-- PAGE CONTENT -->
-        <main class="content">
+      <!-- PAGE CONTENT -->
+      <main class="content">
 
-            <!-- WELCOME -->
-            <div class="page-header">
+        <!-- WELCOME -->
+        <div class="page-header">
 
-                <nav
-                    class="breadcrumb"
-                    aria-label="Breadcrumb"
-                >
+          <nav class="breadcrumb" aria-label="Breadcrumb">
 
-                    <a href="<?= BASE_URL ?>?page=home_main">
-                        Home
-                    </a>
+            <a href="<?= BASE_URL ?>?page=home_main">
+              Home
+            </a>
 
 
-                </nav>
+          </nav>
 
 
-                <h1 class="page-title">
+          <h1 class="page-title">
 
-                    Welcome to
-                    <span>CoolFreeze!</span>
+            Welcome to
+            <span>CoolFreeze!</span>
 
-                </h1>
+          </h1>
 
 
-                <p class="page-subtitle">
+          <p class="page-subtitle">
 
-                    What would you like to do today?
+            What would you like to do today?
 
-                </p>
+          </p>
+
+        </div>
+
+        <!-- SERVICES (full width row) -->
+        <section class="panel services-panel">
+
+          <div class="panel-head">
+
+            <h2 class="panel-title">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+              Services
+            </h2>
+
+            <a href="<?= BASE_URL ?>?page=services_main" class="view-all">
+              View all
+              <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+          </div>
+
+          <div class="service-grid">
+
+            <?php foreach ($services as $service): ?>
+
+            <a href="<?= BASE_URL ?>?page=services_main" class="service-card">
+
+              <span class="service-icon">
+                <i class="fa-solid <?= e($service['icon']) ?>"></i>
+              </span>
+
+              <h3><?= e($service['title']) ?></h3>
+
+              <p><?= e($service['description']) ?></p>
+
+            </a>
+
+            <?php endforeach; ?>
+
+          </div>
+
+        </section>
+
+        <!-- BOTTOM ROW: recent requests + AC care tips, side by side -->
+        <div class="bottom-grid">
+
+          <!-- RECENT REQUESTS -->
+          <section class="panel requests-panel">
+
+            <div class="panel-head">
+
+              <h2 class="panel-title">My Recent Request</h2>
+
+              <a href="<?= BASE_URL ?>?page=request_main" class="view-all">
+                View all
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
 
             </div>
 
-            <!-- SERVICES (full width row) -->
-            <section class="panel services-panel">
+            <div class="table">
 
-                <div class="panel-head">
+              <!-- TABLE HEADER -->
+              <div class="table-row table-head">
+                <span>Request ID</span>
+                <span>Service</span>
+                <span>Date</span>
+                <span>Status</span>
+              </div>
 
-                    <h2 class="panel-title">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                        Services
-                    </h2>
+              <!-- REQUESTS -->
+              <?php if (empty($recentRequests)): ?>
 
-                    <a href="<?= BASE_URL ?>?page=services_main" class="view-all">
-                        View all
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+              <div class="empty-request">
+                <i class="fa-regular fa-folder-open"></i>
+                <p>You don't have any service requests yet.</p>
+                <a href="<?= BASE_URL ?>?page=services_main">Browse Services</a>
+              </div>
 
-                </div>
+              <?php else: ?>
 
-                <div class="service-grid">
+              <?php foreach ($recentRequests as $request): ?>
 
-                    <?php foreach ($services as $service): ?>
+              <div class="table-row" data-request-id="<?= (int) $request['id'] ?>">
 
-                        <a href="<?= BASE_URL ?>?page=services_main" class="service-card">
+                <span class="request-id">
+                  SR-<?= str_pad((string) $request['id'], 6, '0', STR_PAD_LEFT) ?>
+                </span>
 
-                            <span class="service-icon">
-                                <i class="fa-solid <?= e($service['icon']) ?>"></i>
-                            </span>
+                <span><?= e($request['service']) ?></span>
 
-                            <h3><?= e($service['title']) ?></h3>
+                <span class="date"><?= e($request['date']) ?></span>
 
-                            <p><?= e($service['description']) ?></p>
+                <span>
+                  <span class="badge <?= e(statusClass($request['status'])) ?>">
+                    <?= e($request['status']) ?>
+                  </span>
+                </span>
 
-                        </a>
+              </div>
 
-                    <?php endforeach; ?>
+              <?php endforeach; ?>
 
-                </div>
-
-            </section>
-
-            <!-- BOTTOM ROW: recent requests + AC care tips, side by side -->
-            <div class="bottom-grid">
-
-                <!-- RECENT REQUESTS -->
-                <section class="panel requests-panel">
-
-                    <div class="panel-head">
-
-                        <h2 class="panel-title">My Recent Request</h2>
-
-                        <a href="<?= BASE_URL ?>?page=request_main" class="view-all">
-                            View all
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-
-                    </div>
-
-                    <div class="table">
-
-                        <!-- TABLE HEADER -->
-                        <div class="table-row table-head">
-                            <span>Request ID</span>
-                            <span>Service</span>
-                            <span>Date</span>
-                            <span>Status</span>
-                        </div>
-
-                        <!-- REQUESTS -->
-                        <?php if (empty($recentRequests)): ?>
-
-                            <div class="empty-request">
-                                <i class="fa-regular fa-folder-open"></i>
-                                <p>You don't have any service requests yet.</p>
-                                <a href="service.php">Browse Services</a>
-                            </div>
-
-                        <?php else: ?>
-
-                            <?php foreach ($recentRequests as $request): ?>
-
-                                <div class="table-row" data-request-id="<?= (int) $request['id'] ?>">
-
-                                    <span class="request-id">
-                                        SR-<?= str_pad((string) $request['id'], 6, '0', STR_PAD_LEFT) ?>
-                                    </span>
-
-                                    <span><?= e($request['service']) ?></span>
-
-                                    <span class="date"><?= e($request['date']) ?></span>
-
-                                    <span>
-                                        <span class="badge <?= e(statusClass($request['status'])) ?>">
-                                            <?= e($request['status']) ?>
-                                        </span>
-                                    </span>
-
-                                </div>
-
-                            <?php endforeach; ?>
-
-                        <?php endif; ?>
-
-                    </div>
-
-                    <div class="table-footer">
-
-                        <span class="count">
-                            Show <?= (int) $totalRequests ?> of <?= (int) $totalRequests ?> requests
-                        </span>
-
-                        <a href="<?= BASE_URL ?>?page=services_main" class="new-request">
-                            + New Request
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-
-                    </div>
-
-                </section>
-
-                <!-- AC CARE TIPS -->
-                <aside class="tips-panel">
-
-                    <h2 class="tips-title">AC Care Tips</h2>
-
-                    <?php foreach ($careTips as $tip): ?>
-
-                        <div class="tip">
-
-                            <span class="tip-icon">
-                                <i class="fa-solid <?= e($tip['icon']) ?>"></i>
-                            </span>
-
-                            <div>
-                                <h4><?= e($tip['title']) ?></h4>
-                                <p><?= e($tip['text']) ?></p>
-                            </div>
-
-                        </div>
-
-                    <?php endforeach; ?>
-
-                </aside>
+              <?php endif; ?>
 
             </div>
 
-        </main>
+            <div class="table-footer">
+
+              <span class="count">
+                Show <?= count($recentRequests) ?> of <?= (int) $totalRequests ?> requests
+              </span>
+
+              <a href="<?= BASE_URL ?>?page=services_main" class="new-request">
+                + New Request
+                <i class="fa-solid fa-arrow-right"></i>
+              </a>
+
+            </div>
+
+          </section>
+
+          <!-- AC CARE TIPS -->
+          <aside class="tips-panel">
+
+            <h2 class="tips-title">AC Care Tips</h2>
+
+            <?php foreach ($careTips as $tip): ?>
+
+            <div class="tip">
+
+              <span class="tip-icon">
+                <i class="fa-solid <?= e($tip['icon']) ?>"></i>
+              </span>
+
+              <div>
+                <h4><?= e($tip['title']) ?></h4>
+                <p><?= e($tip['text']) ?></p>
+              </div>
+
+            </div>
+
+            <?php endforeach; ?>
+
+          </aside>
+
+        </div>
+
+      </main>
 
     </div>
 
-</div>
+  </div>
 
-<script src="<?= BASE_URL ?>frontend/assets/js/custom.js"></script>
+  <script src="<?= BASE_URL ?>frontend/assets/js/custom.js"></script>
 
 </body>
 

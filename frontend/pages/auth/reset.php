@@ -1,5 +1,8 @@
+<?php if (empty($_SESSION['reset_verified_email'])) { header('Location: ' . BASE_URL . '?page=forget'); exit; } ?>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +12,7 @@
 </head>
 
 <!-- h-dvh + overflow-hidden: the page is exactly one screen tall and never scrolls -->
+
 <body class="h-dvh overflow-hidden bg-white text-gray-900 antialiased">
 
   <div class="flex h-full flex-col md:flex-row">
@@ -20,11 +24,9 @@
         <!-- Top: brand (mobile only) + back button -->
         <div>
           <h2 class="mb-4 text-xl font-bold text-blue-600 md:hidden">COOLFREEZE</h2>
-          <a
-            href="<?= BASE_URL ?>?page=login"
+          <a href="<?= BASE_URL ?>?page=login"
             class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 hover:bg-blue-100"
-            aria-label="Back"
-          >
+            aria-label="Back">
             <img class="h-4 w-4" src="<?= BASE_URL . 'frontend/assets/img/back-arrow.svg' ?>" alt="">
           </a>
         </div>
@@ -40,10 +42,8 @@
           </p>
 
           <!-- Confirm: goes on to the "set a new password" page -->
-          <a
-            href="<?= BASE_URL ?>?page=set_password"
-            class="mt-6 block w-full rounded-md bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
+          <a href="<?= BASE_URL ?>?page=set_password"
+            class="mt-6 block w-full rounded-md bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Confirm
           </a>
 
@@ -62,11 +62,8 @@
 
     <!-- RIGHT SIDE: image (hidden on mobile, shown from md and up) -->
     <div class="relative hidden h-full overflow-hidden md:block md:w-1/2">
-      <img
-        src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
-        class="absolute inset-0 h-full w-full object-cover -scale-x-100"
-        alt=""
-      >
+      <img src="<?= BASE_URL . 'frontend/assets/img/login_register_background.jpg' ?>"
+        class="absolute inset-0 h-full w-full object-cover -scale-x-100" alt="">
 
       <!-- Right-aligned text in the top part of the panel, above the aircon in the image -->
       <div class="absolute right-0 top-0 flex max-w-full flex-col items-end p-6 text-right lg:p-10">
@@ -85,4 +82,5 @@
   </div>
 
 </body>
+
 </html>
