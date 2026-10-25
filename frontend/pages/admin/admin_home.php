@@ -236,6 +236,6 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
 
     </div>
 
-    <script src="<?= BASE_URL ?>frontend/assets/js/admin-dashboard.js"></script>
+    <script src="<?= BASE_URL ?>frontend/assets/js/service_reqs.js"></script>
 </body>
 </html>
