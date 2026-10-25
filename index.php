@@ -26,6 +26,9 @@ $pages = [
     'faq_main' => 'main/faq_main.php',
 
     'admin_home' => 'admin/admin_home.php',
+    'admin_technicians' => 'admin/admin_technicians.php',
+    'admin_client' => 'admin/admin_client.php',
+    'admin_services' => 'admin/admin_services.php',
 ];
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home_main';  
