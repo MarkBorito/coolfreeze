@@ -49,7 +49,7 @@ $sidebarMenu = [
 <aside class="sidebar" id="sidebar">
 
   <a href="<?= e($sidebarPagesUrl) ?>?page=landing" class="brand">
-    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/coolfreeze_horizontal_logo.svg" alt="Coolfreeze logo"
+    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/CoolFreeze_Logo.svg" alt="Coolfreeze logo"
       class="card-img" width="240px">
   </a>
 

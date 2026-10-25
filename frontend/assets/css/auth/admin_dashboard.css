@@ -1,0 +1,199 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap");
+
+/* =========================================================
+   GLOBAL VARIABLES  (change colors here)
+========================================================= */
+
+:root {
+  --primary: #2f6fed;
+  --primary-dark: #1c3f8f;
+
+  --text: #24344d;
+  --muted: #8592a6;
+
+  --bg: #f5f8fc;
+  --panel: #fbfcfe;
+  --white: #ffffff;
+  --border: #e3e9f2;
+
+  --chip-bg: #eef1f6;
+  --chip-color: #5b6b85;
+
+  --blue: #2f6fed;
+  --blue-bg: #dce9fd;
+
+  --light-blue: #f8fafc;
+  --lightest-blue: #eff6ff;
+
+  --green: #2fb872;
+  --green-bg: #d9f3e4;
+
+  --orange: #f0a021;
+  --orange-bg: #fcecc9;
+
+  --danger: #ef5350;
+  --danger-bg: #fbdedd;
+
+  --purple: #5b4bea;
+  --purple-bg: #e6dcfb;
+
+  /* TABLE HEADERS: blue instead of dark navy */
+  --table-head-bg: #2f6fed;
+  --table-head-text: #ffffff;
+
+  --tips-grad-start: #2f6fed;
+  --tips-grad-end: #1c3f8f;
+  --tips-icon-bg: rgba(255, 255, 255, 0.2);
+  --tips-text: rgba(255, 255, 255, 0.9);
+
+  --teal: #0f9aa0;
+  --teal-bg: #d7f1f2;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+
+  --sidebar-w: 240px;
+}
+
+/* =========================================================
+   ADMIN DASHBOARD  (scoped to .admin-dash / .dash-*)
+========================================================= */
+
+.admin-dash {
+    font-family: inherit;
+    color: var(--text);
+}
+.admin-dash *, .admin-dash *::before, .admin-dash *::after { box-sizing: border-box; }
+.admin-dash h1, .admin-dash h2, .admin-dash p { margin: 0; }
+.admin-dash a { text-decoration: none; }
+
+/* ---------- Welcome ---------- */
+.admin-dash__crumb   { font-size: 12px; color: var(--text); }
+.admin-dash__welcome { font-size: 32px; font-weight: 800; line-height: 1.15; color: var(--text); }
+.admin-dash__welcome span { color: var(--primary); }
+.admin-dash__sub     { margin: 4px 0 12px; font-size: 14px; color: var(--muted); }
+
+/* ---------- Summary cards ---------- */
+.admin-dash__cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+    margin-bottom: 10px;
+}
+.dash-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: 0 2px 0 var(--border);
+}
+.dash-card__icon {
+    display: grid; place-items: center;
+    width: 60px; height: 60px; margin-bottom: 16px;
+    border-radius: 50%; font-size: 24px;
+}
+.dash-card__label { font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+.dash-card__value { font-size: 38px; font-weight: 800; line-height: 1.1; }
+
+.dash-card--pending   .dash-card__icon  { background: var(--blue-bg);   color: var(--blue); }
+.dash-card--pending   .dash-card__value { color: var(--blue); }
+.dash-card--confirmed .dash-card__icon  { background: var(--green-bg);  color: var(--green); }
+.dash-card--confirmed .dash-card__value { color: var(--green); }
+.dash-card--ongoing   .dash-card__icon  { background: var(--orange-bg); color: var(--orange); }
+.dash-card--ongoing   .dash-card__value { color: var(--orange); }
+.dash-card--completed .dash-card__icon  { background: var(--purple-bg); color: var(--purple); }
+.dash-card--completed .dash-card__value { color: var(--purple); }
+
+/* ---------- Panels ---------- */
+.dash-panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 0 var(--border);
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.dash-panel__head {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px; padding: 0 24px;
+}
+.dash-panel__head h2 { font-size: 20px; font-weight: 700; color: var(--text); }
+.dash-viewall {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 13px; font-weight: 500; color: var(--primary);
+}
+.dash-viewall:hover { text-decoration: underline; }
+
+/* ---------- Tables ---------- */
+.dash-table-wrap { overflow-x: auto; }
+.dash-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+
+/* Header color is controlled by --table-head-bg in :root above */
+.dash-table thead th {
+    height: 40px;
+    background: var(--table-head-bg);
+    color: var(--table-head-text);
+    font-size: 13px; font-weight: 600; text-align: center;
+}
+.dash-table tbody td {
+    height: 50px; padding: 0 12px;
+    text-align: center;
+    color: var(--muted);
+    background: var(--light-blue);
+}
+.dash-table tbody tr + tr td { border-top: 1px solid var(--border); }
+.dash-table .dash-strong { color: var(--text); font-weight: 500; }
+.dash-table .dash-empty td { padding: 28px 12px; }
+.dash-table tr[hidden] { display: none; }
+
+/* Request status pills */
+.dash-pill {
+    display: block; width: 100%; max-width: 200px; margin: 0 auto;
+    padding: 3px 8px; border: 1px solid;
+    border-radius: 999px; font-size: 11px; line-height: 14px; text-align: center;
+}
+.dash-pill--pending   { background: var(--blue-bg);   border-color: var(--blue);   color: var(--blue); }
+.dash-pill--confirmed { background: var(--green-bg);  border-color: var(--green);  color: var(--green); }
+.dash-pill--ongoing   { background: var(--orange-bg); border-color: var(--orange); color: var(--orange); }
+.dash-pill--cancelled { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+
+/* Technician status */
+.dash-table--tech, .dash-table--schedule { min-width: 0; }
+.dash-table--tech tbody td:first-child,
+.dash-table--schedule thead th:first-child,
+.dash-table--schedule tbody td:first-child { padding-left: 24px; text-align: left; }
+
+.dash-tag {
+    display: block; width: 100%; max-width: 200px;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; line-height: 14px; text-align: center;
+}
+.dash-tag--available, .dash-tag--total { background: var(--blue-bg);   color: var(--blue); }
+.dash-tag--assigned                    { background: var(--green-bg);  color: var(--green); }
+.dash-tag--offduty                     { background: var(--danger-bg); color: var(--danger); }
+
+.dash-count { font-size: 22px; font-weight: 800; }
+.dash-count--available, .dash-count--total { color: var(--blue); }
+.dash-count--assigned { color: var(--green); }
+.dash-count--offduty  { color: var(--danger); }
+
+/* Today's schedule icons */
+.dash-table--schedule tbody td i { margin-right: 12px; font-size: 18px; }
+
+/* ---------- Bottom row ---------- */
+.admin-dash__bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.admin-dash__bottom .dash-panel { margin-bottom: 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1200px) { .admin-dash__cards { gap: 20px; } }
+@media (max-width: 992px)  { .admin-dash__cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px)  {
+    .admin-dash__bottom { grid-template-columns: 1fr; }
+    .admin-dash__welcome { font-size: 26px; }
+}
+@media (max-width: 520px)  {
+    .admin-dash__cards { grid-template-columns: 1fr; }
+    .dash-panel__head { padding: 0 16px; }
+    .dash-panel__head h2 { font-size: 17px; }
+}

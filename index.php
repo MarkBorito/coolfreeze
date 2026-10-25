@@ -28,7 +28,7 @@ $pages = [
     'admin_home' => 'admin/admin_home.php',
 ];
 
-$page = isset($_GET['page']) ? $_GET['page'] : 'landing';  
+$page = isset($_GET['page']) ? $_GET['page'] : 'home_main';  
 
 if (
     !is_string($page) ||
