@@ -33,7 +33,7 @@ $pages = [
     'admin_analytics' => 'admin/admin_analytics.php',   
 ];
 
-$page = isset($_GET['page']) ? $_GET['page'] : 'admin_requests';  
+$page = isset($_GET['page']) ? $_GET['page'] : 'landing';  
 
 if (
     !is_string($page) ||

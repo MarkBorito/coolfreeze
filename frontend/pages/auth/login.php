@@ -4,7 +4,6 @@ if ($role = auth_role()) {
     exit;
 }
 ?>
-?>
 
 <!DOCTYPE html>
 <html lang="en">

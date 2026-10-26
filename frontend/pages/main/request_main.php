@@ -200,7 +200,7 @@ foreach ($requests as $request) {
           <!-- TOOLBAR -->
           <div class="requests-toolbar">
 
-            <form class="search" action="requests.php" method="GET">
+            <form class="search" action="request_main.php" method="GET">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="search" name="q" placeholder="Search">
             </form>
@@ -559,31 +559,37 @@ foreach ($requests as $request) {
   // Full request detail data, keyed by list index — rendered by PHP above.
   const REQUESTS_DATA = <?= json_encode($requestsForJs, JSON_UNESCAPED_UNICODE) ?>;
 
-  document.addEventListener('DOMContentLoaded', function() {
+   (function() {
 
-    // -------------------- Mobile sidebar toggle --------------------
-    var sidebar = document.getElementById('sidebar');
-    var sidebarOverlay = document.getElementById('overlay');
     var menuButton = document.getElementById('menuButton');
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('overlay');
 
-    var openSidebar = function() {
-      sidebar.classList.add('open');
-      sidebarOverlay.classList.add('show');
-    };
+    function setOpen(open) {
+      sidebar.classList.toggle('open', open);
+      overlay.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
 
-    var closeSidebar = function() {
-      sidebar.classList.remove('open');
-      sidebarOverlay.classList.remove('show');
-    };
+    if (menuButton && sidebar && overlay) {
 
-    if (menuButton && sidebar && sidebarOverlay) {
       menuButton.addEventListener('click', function() {
-        if (sidebar.classList.contains('open')) {
-          closeSidebar();
-        } else {
-          openSidebar();
+        setOpen(!sidebar.classList.contains('open'));
+      });
+
+      overlay.addEventListener('click', function() {
+        setOpen(false);
+      });
+
+      window.addEventListener('resize', function() {
+        if (!window.matchMedia('(max-width: 900px)').matches) {
+          setOpen(false);
         }
       });
+
+    }
+
+  })();
 
       sidebarOverlay.addEventListener('click', closeSidebar);
 
@@ -593,8 +599,7 @@ foreach ($requests as $request) {
         }
       });
 
-      // Collapse the sidebar back down if the viewport is resized
-      // past the mobile breakpoint while it's open.
+      
       window.addEventListener('resize', function() {
         if (window.innerWidth > 900) {
           closeSidebar();

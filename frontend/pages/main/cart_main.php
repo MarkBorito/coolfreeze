@@ -58,7 +58,7 @@ foreach ($cartItems as $item) {
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/cart_main.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>frontend/assets/css/main.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -256,14 +256,15 @@ foreach ($cartItems as $item) {
 
         <div class="step-panel active" data-panel="2">
 
-          <div class="cart-schedule-grid">
+          
+          <!-- STEP 2: SCHEDULE & LOCATION -->
+
+          <div class="schedule-grid">
 
             <!-- SERVICE DETAILS -->
-
             <div class="info-card">
 
               <div class="info-card-head">
-
                 <span class="info-card-title">
                   <i class="fa-solid fa-screwdriver-wrench"></i>
                   Service Details
@@ -272,7 +273,6 @@ foreach ($cartItems as $item) {
                 <button type="button" class="edit-link" id="editCartLink">
                   <i class="fa-solid fa-pen"></i> Edit
                 </button>
-
               </div>
 
               <div class="service-summary" id="cartSummaryList"></div>
@@ -284,108 +284,118 @@ foreach ($cartItems as $item) {
 
             </div>
 
+            <!-- SCHEDULE -->
+            <div class="info-card">
 
-            <!-- SCHEDULE + ADDRESS -->
-
-            <div class="cart-stack">
-
-              <div class="info-card">
-
-                <div class="info-card-head">
-                  <span class="info-card-title">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    Schedule
-                  </span>
-                </div>
-
-                <label class="field">
-                  <span>Preferred Date</span>
-                  <input type="date" id="preferredDate">
-                </label>
-
-                <label class="field">
-                  <span>Preferred Time</span>
-                  <select id="preferredTime">
-                    <option value="">Select a time slot</option>
-                    <option>8:00 AM - 9:00 AM</option>
-                    <option>9:00 AM - 10:00 AM</option>
-                    <option>10:00 AM - 11:00 AM</option>
-                    <option>1:00 PM - 2:00 PM</option>
-                    <option>2:00 PM - 3:00 PM</option>
-                    <option>3:00 PM - 4:00 PM</option>
-                  </select>
-                </label>
-
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-calendar-days"></i>
+                  Schedule
+                </span>
               </div>
 
+              <label class="field">
+                <span>Preferred Date</span>
+                <input type="date" id="preferredDate">
+              </label>
 
-              <div class="info-card">
-
-                <div class="info-card-head">
-                  <span class="info-card-title">
-                    <i class="fa-solid fa-location-dot"></i>
-                    Service Address
-                  </span>
-                </div>
-
-                <label class="field">
-                  <span>Complete Address</span>
-                  <textarea id="serviceAddress" rows="3"
-                    placeholder="House/Unit No., Street, Barangay, City, Province"></textarea>
-                </label>
-
-              </div>
+              <label class="field">
+                <span>Preferred Time</span>
+                <select id="preferredTime">
+                  <option value="">Select a time slot</option>
+                  <option>8:00 AM - 9:00 AM</option>
+                  <option>9:00 AM - 10:00 AM</option>
+                  <option>10:00 AM - 11:00 AM</option>
+                  <option>1:00 PM - 2:00 PM</option>
+                  <option>2:00 PM - 3:00 PM</option>
+                  <option>3:00 PM - 4:00 PM</option>
+                </select>
+              </label>
 
             </div>
 
+            <!-- SERVICE ADDRESS -->
+            <div class="info-card">
 
-            <!-- NOTE + CONTACT -->
-
-            <div class="cart-stack">
-
-              <div class="info-card">
-
-                <div class="info-card-head">
-                  <span class="info-card-title">
-                    <i class="fa-solid fa-note-sticky"></i>
-                    Note
-                  </span>
-                </div>
-
-                <label class="field">
-                  <span>Description / Instructions</span>
-                  <textarea id="serviceNote" rows="3"
-                    placeholder="e.g. Please clean it and check if there are any issues with the unit. Thank you!"></textarea>
-                </label>
-
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-location-dot"></i>
+                  Service Address
+                </span>
               </div>
 
-
-              <div class="info-card">
-
-                <div class="info-card-head">
-                  <span class="info-card-title">
-                    <i class="fa-solid fa-address-card"></i>
-                    Contact
-                  </span>
-                </div>
-
-                <label class="field">
-                  <span>Full Name</span>
-                  <input type="text" id="contactName" placeholder="Juan Dela Cruz"
-                    value="<?= e($customer['full_name'] ?: $userName) ?>">
-                </label>
-
-                <label class="field">
-                  <span>Phone Number</span>
-                  <input type="tel" id="contactPhone" placeholder="0999-999-9999" value="<?= e($customer['phone']) ?>">
-                </label>
-
-              </div>
+              <label class="field">
+                <span>Complete Address</span>
+                <textarea
+                  id="serviceAddress"
+                  rows="4"
+                  placeholder="House/Unit No., Street, Barangay, City, Province"
+                ></textarea>
+              </label>
 
             </div>
 
           </div>
+
+          <!-- NOTE + CONTACT -->
+          <div class="schedule-grid schedule-grid-2">
+
+            <!-- NOTE -->
+            <div class="info-card">
+
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-note-sticky"></i>
+                  Note
+                </span>
+              </div>
+
+              <label class="field">
+                <span>Description / Instructions</span>
+                <textarea
+                  id="serviceNote"
+                  rows="3"
+                  placeholder="e.g. Please clean it and check if there are any issues with the unit. Thank you!"
+                ></textarea>
+              </label>
+
+            </div>
+
+            <!-- CONTACT -->
+            <div class="info-card">
+
+              <div class="info-card-head">
+                <span class="info-card-title">
+                  <i class="fa-solid fa-address-card"></i>
+                  Contact
+                </span>
+              </div>
+
+              <label class="field">
+                <span>Full Name</span>
+                <input
+                  type="text"
+                  id="contactName"
+                  placeholder="Juan Dela Cruz"
+                  value="<?= e($customer['full_name'] ?: $userName) ?>"
+                >
+              </label>
+
+              <label class="field">
+                <span>Phone Number</span>
+                <input
+                  type="tel"
+                  id="contactPhone"
+                  placeholder="0999-999-9999"
+                  value="<?= e($customer['phone']) ?>"
+                >
+              </label>
+
+            </div>
+
+          </div>
+
+
 
 
           <p class="field-error" id="step2Error" style="display:none;">
@@ -552,7 +562,6 @@ foreach ($cartItems as $item) {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?= BASE_URL ?>frontend/assets/js/alerts.js"></script>
   <script>
-  /* ---------- Sidebar (same as services page) ---------- */
 
   (function() {
 
