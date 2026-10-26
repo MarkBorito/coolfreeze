@@ -12,34 +12,35 @@ $currentPage = $currentPage ?? '';
 
 $sidebarPagesUrl = BASE_URL;
 
-// Single source of truth for the menu. 'key' is matched against $currentPage.
+// Single source of truth for the menu. 'key' is matched against $currentPage,
+// so each admin page must set $currentPage to the same value as its key here.
 
 $sidebarMenu = [
     [
         'title' => 'Service Management',
         'items' => [
-            ['key' => 'services', 'label' => 'Service Request', 'icon' => 'fa-screwdriver-wrench', 'link' => '?page=services_main'],
-            ['key' => 'services', 'label' => 'Technician', 'icon' => 'fa-screwdriver-wrench', 'link' => '?page=services_main'],
+            ['key' => 'admin_requests',    'label' => 'Service Request', 'icon' => 'fa-clipboard-list',      'link' => '?page=admin_requests'],
+            ['key' => 'admin_technicians', 'label' => 'Technician',      'icon' => 'fa-screwdriver-wrench',  'link' => '?page=admin_technicians'],
         ],
     ],
     [
         'title' => 'Management',
         'items' => [
-            ['key' => 'cart', 'label' => 'Client', 'icon' => 'fa-cart-shopping', 'link' => '?page=cart_main'],
-            ['key' => 'cart', 'label' => 'Services', 'icon' => 'fa-cart-shopping', 'link' => '?page=cart_main'],
+            ['key' => 'admin_client',   'label' => 'Client',   'icon' => 'fa-users', 'link' => '?page=admin_client'],
+            ['key' => 'admin_services', 'label' => 'Services', 'icon' => 'fa-gear',  'link' => '?page=admin_services'],
         ],
     ],
     [
         'title' => 'Report',
         'items' => [
-            ['key' => 'analytics', 'label' => 'Analytics', 'icon' => 'fa-clipboard-list', 'link' => '?page=request_main'],
+            ['key' => 'admin_analytics', 'label' => 'Analytics', 'icon' => 'fa-chart-line', 'link' => '?page=admin_analytics'],
         ],
     ],
     [
         'title' => 'System',
         'items' => [
-            ['key' => 'profile',  'label' => 'Profile',          'icon' => 'fa-user',            'link' => '?page=profile_main'],
-            ['key' => 'faqs',     'label' => "Setting",  'icon' => 'fa-wrench', 'link' => '?page=faq_main'],
+            ['key' => 'profile', 'label' => 'Profile', 'icon' => 'fa-user',   'link' => '?page=profile_main'],
+            ['key' => 'faqs',    'label' => 'Setting', 'icon' => 'fa-wrench', 'link' => '?page=faq_main'],
         ],
     ],
 ];
@@ -49,7 +50,7 @@ $sidebarMenu = [
 <aside class="sidebar" id="sidebar">
 
   <a href="<?= e($sidebarPagesUrl) ?>?page=landing" class="brand">
-    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/coolfreeze_horizontal_logo.svg" alt="Coolfreeze logo"
+    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/CoolFreeze_Logo.svg" alt="Coolfreeze logo"
       class="card-img" width="240px">
   </a>
 
@@ -57,8 +58,8 @@ $sidebarMenu = [
 
     <p class="menu-title">Dashboard</p>
 
-    <a href="<?= e($sidebarPagesUrl) ?>?page=home_main"
-      class="menu-link <?= $currentPage === 'home' ? 'active' : '' ?>">
+    <a href="<?= e($sidebarPagesUrl) ?>?page=admin_home"
+      class="menu-link <?= $currentPage === 'admin_home' ? 'active' : '' ?>">
       <i class="fa-solid fa-house"></i>
       Home
     </a>

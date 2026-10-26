@@ -1,3 +1,4 @@
+
 <?php
 $agRole = auth_role();
 
@@ -20,6 +21,7 @@ if ($agRole === 'admin') {
     $agStmt->close();
     $agOk = $agRow && (int) $agRow['is_active'] === 1;
 }
+
 
 if (!$agOk) {
     $_SESSION = [];

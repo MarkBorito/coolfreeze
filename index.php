@@ -29,9 +29,11 @@ $pages = [
     'admin_technicians' => 'admin/admin_technicians.php',
     'admin_client' => 'admin/admin_client.php',
     'admin_services' => 'admin/admin_services.php',
+    'admin_requests' => 'admin/service_request_main.php',
+    'admin_analytics' => 'admin/admin_analytics.php',   
 ];
 
-$page = isset($_GET['page']) ? $_GET['page'] : 'landing';  
+$page = isset($_GET['page']) ? $_GET['page'] : 'admin_requests';  
 
 if (
     !is_string($page) ||
