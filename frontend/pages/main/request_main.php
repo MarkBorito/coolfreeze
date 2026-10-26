@@ -559,53 +559,44 @@ foreach ($requests as $request) {
   // Full request detail data, keyed by list index — rendered by PHP above.
   const REQUESTS_DATA = <?= json_encode($requestsForJs, JSON_UNESCAPED_UNICODE) ?>;
 
-   (function() {
+  document.addEventListener('DOMContentLoaded', function() {
 
-    var menuButton = document.getElementById('menuButton');
+    // -------------------- Mobile sidebar toggle --------------------
     var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('overlay');
+    var sidebarOverlay = document.getElementById('overlay');
+    var menuButton = document.getElementById('menuButton');
 
-    function setOpen(open) {
+    var setSidebarOpen = function(open) {
       sidebar.classList.toggle('open', open);
-      overlay.classList.toggle('open', open);
+      sidebarOverlay.classList.toggle('open', open);
       menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
+    };
 
-    if (menuButton && sidebar && overlay) {
+    if (menuButton && sidebar && sidebarOverlay) {
 
       menuButton.addEventListener('click', function() {
-        setOpen(!sidebar.classList.contains('open'));
+        setSidebarOpen(!sidebar.classList.contains('open'));
       });
 
-      overlay.addEventListener('click', function() {
-        setOpen(false);
+      sidebarOverlay.addEventListener('click', function() {
+        setSidebarOpen(false);
       });
-
-      window.addEventListener('resize', function() {
-        if (!window.matchMedia('(max-width: 900px)').matches) {
-          setOpen(false);
-        }
-      });
-
-    }
-
-  })();
-
-      sidebarOverlay.addEventListener('click', closeSidebar);
 
       document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
-          closeSidebar();
+          setSidebarOpen(false);
         }
       });
 
-      
+      // Close the drawer if the window is resized past the mobile breakpoint
       window.addEventListener('resize', function() {
-        if (window.innerWidth > 900) {
-          closeSidebar();
+        if (!window.matchMedia('(max-width: 900px)').matches) {
+          setSidebarOpen(false);
         }
       });
+
     }
+
 
     // -------------------- Request list + detail panel --------------------
     var list = document.getElementById('requestList');
