@@ -39,10 +39,11 @@ $sidebarMenu = [
     [
         'title' => 'System',
         'items' => [
-            ['key' => 'profile', 'label' => 'Profile', 'icon' => 'fa-user',   'link' => '?page=profile_main'],
+            ['key' => 'admin_profile', 'label' => 'Profile', 'icon' => 'fa-user',   'link' => '?page=admin_profile'],
             ['key' => 'faqs',    'label' => 'Setting', 'icon' => 'fa-wrench', 'link' => '?page=faq_main'],
         ],
     ],
+    
 ];
 ?>
 
