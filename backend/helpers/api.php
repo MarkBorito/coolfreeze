@@ -65,7 +65,7 @@ function require_admin(mysqli $conn): int {
     $active = false;
     try {
         if ($id > 0) {
-            $stmt = $conn->prepare('SELECT u.is_active FROM admins a JOIN users u ON u.user_id = c.user_id WHERE a.admin_id = ? LIMIT 1');
+            $stmt = $conn->prepare('SELECT u.is_active FROM admins a JOIN users u ON u.user_id = a.user_id WHERE a.admin_id = ? LIMIT 1');
             $stmt->bind_param('i', $id);
             $stmt->execute();
             $row = $stmt->get_result()->fetch_assoc();
