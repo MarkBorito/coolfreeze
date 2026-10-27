@@ -136,8 +136,9 @@ select {
     border-radius: 10px;
     background: #cbd5e1;
 }
+
 .imglogo {
-  padding: 9px;
+    padding: 9px;
 }
 
 /* Sidebar menu */
@@ -282,66 +283,43 @@ select {
     color: var(--text);
 }
 
-/* =========================================================
-   TOP ACTIONS
-========================================================= */
-
 .top-actions {
-  display: flex;
-
-  align-items: center;
-
-  margin-left: auto;
-
-  gap: 20px;
-
-  height: 44px;
-
-  padding: 0 15px;
-
-  border: 1px solid var(--border);
-
-  border-radius: 6px;
-
-  background: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    height: 44px;
+    margin-left: auto;
+    padding: 0 15px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--white);
 }
 
 .icon-link {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  color: var(--muted);
-
-  font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: var(--muted);
 }
 
 .icon-link:hover {
-  color: var(--primary);
+    color: var(--primary);
 }
 
 .profile-link {
-  display: flex;
-
-  align-items: center;
-
-  gap: 5px;
-
-  padding-left: 10px;
-
-  border-left: 1px solid var(--border);
-
-  font-size: 14px;
-
-  font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding-left: 10px;
+    border-left: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .profile-link i {
-  color: var(--muted);
-
-  font-size: 17px;
+    font-size: 17px;
+    color: var(--muted);
 }
 
 /* ---------------------------------------------------------
@@ -353,9 +331,9 @@ select {
     flex: 1;
     flex-direction: column;
     width: 100%;
-    max-width: 1500px;
+    max-width: none;
     min-height: 0;
-    margin: 0 auto;
+    margin: 0;
     padding: 21px 23px 18px;
     overflow: hidden;
 }
@@ -547,7 +525,7 @@ select {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid #dfe6f0;
+    border: 1px solid var(--border);
     border-radius: 8px;
     background: #fff;
     box-shadow: 0 2px 5px #1b37610a;
@@ -1068,5 +1046,278 @@ tbody tr[hidden] {
 
     .detail-status {
         margin-left: auto;
+    }
+}
+
+/* =========================================================
+   CLIENT-SPECIFIC STYLES
+========================================================= */
+
+/* Make the HTML "hidden" attribute always win over display rules */
+[hidden] {
+    display: none !important;
+}
+
+/* ---------------------------------------------------------
+   1. Stat cards: three columns instead of four
+--------------------------------------------------------- */
+.stats-grid.stats-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* ---------------------------------------------------------
+   2. Status badges
+--------------------------------------------------------- */
+.status.active {
+    border-color: #8adbb5;
+    background: #e1f7ec;
+    color: #229d67;
+}
+
+.status.inactive {
+    border-color: #f5a3a3;
+    background: #ffeded;
+    color: #e45454;
+}
+
+/* ---------------------------------------------------------
+   3. Panel header and identity block
+--------------------------------------------------------- */
+
+/* The mockup shows a red "x" in the corner on desktop too */
+.client-panel .close-detail {
+    display: block;
+    font-size: 31px;
+    line-height: 1;
+    color: var(--danger);
+}
+
+.detail-ident {
+    text-align: center;
+}
+
+.detail-ident h3 {
+    margin-bottom: 3px;
+}
+
+.detail-id {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.detail-person {
+    gap: 5px;
+}
+
+.detail-status {
+    margin-top: 3px;
+}
+
+.detail-status.inactive {
+    color: var(--danger);
+}
+
+/* ---------------------------------------------------------
+   4. Client information list (label above value)
+--------------------------------------------------------- */
+.info-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 9px 0;
+}
+
+.info-item > i {
+    width: 18px;
+    margin-top: 4px;
+    font-size: 15px;
+    text-align: center;
+    color: #8b99ac;
+}
+
+.info-item > div {
+    min-width: 0;
+}
+
+.info-label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.info-value {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: #41516a;
+    overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------
+   5. Service history list
+--------------------------------------------------------- */
+.service-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.service-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 13px;
+    padding: 13px 0;
+    border-bottom: 1px solid #edf1f6;
+}
+
+.service-item:last-child {
+    border-bottom: 0;
+}
+
+.service-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9f1ff;
+    font-size: 15px;
+    color: var(--primary);
+}
+
+.service-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 117px;
+}
+
+.service-main strong {
+    font-size: 15px;
+    color: #2b3a52;
+}
+
+.service-main span {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.service-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 14px;
+    color: #718096;
+}
+
+.service-meta i {
+    width: 16px;
+    font-size: 13px;
+    text-align: center;
+    color: #8b99ac;
+}
+
+.service-item .status {
+    min-width: 88px;
+}
+
+.service-empty {
+    padding: 18px 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* ---------------------------------------------------------
+   6. Panel buttons
+--------------------------------------------------------- */
+.detail-footer.split {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    padding: 12px 21px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter .15s ease;
+}
+
+.btn:hover {
+    filter: brightness(.97);
+}
+
+.btn-danger {
+    border-color: #f5a3a3;
+    background: #fbdedd;
+    color: #e45454;
+}
+
+.btn-success {
+    border-color: #8fe0b8;
+    background: #dcf8e9;
+    color: #259e68;
+}
+
+/* ---------------------------------------------------------
+   7. Responsive
+--------------------------------------------------------- */
+
+/* Tablet: keep the panel comfortably wide for the buttons */
+@media (max-width: 900px) and (min-width: 681px) {
+    .client-panel {
+        width: min(468px, 52%);
+    }
+}
+
+/* Mobile */
+@media (max-width: 680px) {
+    /* Email and phone are in the profile panel, so hide them in the table */
+    .hide-sm {
+        display: none;
+    }
+
+    /* Three cards become 2 + 1 */
+    .stats-grid.stats-three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stats-grid.stats-three .stat-card:last-child {
+        grid-column: 1 / -1;
+    }
+
+    /* Identity block lines up left, next to the avatar */
+    .detail-person {
+        align-items: center;
+    }
+
+    .detail-ident {
+        flex: 1;
+        min-width: 0;
+        text-align: left;
+    }
+
+    .detail-ident h3 {
+        text-align: left;
+    }
+
+    /* Full-width buttons that stack nicely on small phones */
+    .detail-footer.split .btn {
+        flex: 1 1 140px;
     }
 }
