@@ -53,7 +53,16 @@ $requests    = request_get_all();
 $technicians = technician_get_all();
 $statistics  = request_get_statistics();
 $visible     = sr_sort_requests(sr_filter_requests($requests, $searchQuery, $statusFilter), $sortOption);
-$pagination  = sr_paginate($visible, $pageNumber);
+$perPage     = 4; // rows per page
+$totalItems  = count($visible);
+$totalPages  = max(1, (int) ceil($totalItems / $perPage));
+$pageNumber  = min($pageNumber, $totalPages);
+$pagination  = [
+    'items' => array_slice($visible, ($pageNumber - 1) * $perPage, $perPage),
+    'page'  => $pageNumber,
+    'pages' => $totalPages,
+    'total' => $totalItems,
+];
 
 function sr_url(array $o = []): string
 {

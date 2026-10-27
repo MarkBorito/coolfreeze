@@ -251,10 +251,10 @@ select {
 .top-search {
     display: flex;
     align-items: center;
-    gap: 8px;
-    width: min(300px, 45%);
-    height: 30px;
-    padding: 0 10px;
+    gap: 10px;
+    width: min(390px, 45%);
+    height: 39px;
+    padding: 0 13px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: #f2f6fd;
@@ -270,7 +270,7 @@ select {
 }
 
 .top-search i {
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .top-search input {
@@ -279,7 +279,7 @@ select {
     border: 0;
     outline: 0;
     background: transparent;
-    font-size: 10px;
+    font-size: 14px;
     color: var(--text);
 }
 
@@ -334,7 +334,7 @@ select {
     max-width: 1500px;
     min-height: 0;
     margin: 0 auto;
-    padding: 16px 18px 14px;
+    padding: 21px 23px 18px;
     overflow: hidden;
 }
 
@@ -343,19 +343,19 @@ select {
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 10px;
+    gap: 16px;
+    margin-bottom: 13px;
 }
 
 .eyebrow {
-    margin: 0 0 3px;
-    font-size: 9px;
+    margin: 0 0 4px;
+    font-size: 13px;
     color: #687991;
 }
 
 .page-heading h1 {
     margin: 0;
-    font: 700 20px/1.3 var(--font-heading);
+    font: 700 28px/1.3 var(--font-heading);
     letter-spacing: -.5px;
 }
 
@@ -364,21 +364,21 @@ select {
 }
 
 .subtitle {
-    margin: 4px 0 0;
-    font-size: 10px;
+    margin: 5px 0 0;
+    font-size: 14px;
     color: var(--muted);
 }
 
 .primary-button {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 8px 11px;
+    gap: 9px;
+    padding: 10px 14px;
     border: 0;
     border-radius: 6px;
     background: var(--primary);
     color: #fff;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -390,13 +390,13 @@ select {
     display: grid;
     flex: 0 0 auto;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
-    margin-bottom: 8px;
+    gap: 13px;
+    margin-bottom: 10px;
 }
 
 .stat-card {
-    min-height: 94px;
-    padding: 11px 13px;
+    min-height: 122px;
+    padding: 14px 17px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: #fff;
@@ -406,11 +406,11 @@ select {
 .stat-icon {
     display: grid;
     place-items: center;
-    width: 26px;
-    height: 26px;
-    margin-bottom: 9px;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 12px;
     border-radius: 50%;
-    font-size: 12px;
+    font-size: 17px;
 }
 
 .stat-icon.blue {
@@ -430,13 +430,13 @@ select {
 }
 
 .stat-card p {
-    margin: 0 0 4px;
-    font-size: 9px;
+    margin: 0 0 5px;
+    font-size: 13px;
     color: #7d8ba0;
 }
 
 .stat-card strong {
-    font: 700 20px var(--font-heading);
+    font: 700 28px var(--font-heading);
     color: var(--primary);
 }
 
@@ -456,17 +456,17 @@ select {
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    margin-bottom: 6px;
+    gap: 13px;
+    margin-bottom: 8px;
 }
 
 .table-search {
     display: flex;
     align-items: center;
-    gap: 8px;
-    width: min(320px, 50%);
-    height: 30px;
-    padding: 0 10px;
+    gap: 10px;
+    width: min(416px, 50%);
+    height: 39px;
+    padding: 0 13px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: #f1f6ff;
@@ -474,7 +474,7 @@ select {
 }
 
 .table-search i {
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .table-search input {
@@ -482,23 +482,23 @@ select {
     border: 0;
     outline: 0;
     background: transparent;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 .filters {
     display: flex;
-    gap: 7px;
+    gap: 9px;
 }
 
 .filters select {
-    max-width: 170px;
-    height: 30px;
-    padding: 0 8px;
+    max-width: 221px;
+    height: 39px;
+    padding: 0 10px;
     border: 1px solid var(--border);
     border-radius: 6px;
     background: #fff;
     color: #687991;
-    font-size: 10px;
+    font-size: 14px;
 }
 
 /* ---------------------------------------------------------
@@ -508,7 +508,7 @@ select {
     display: grid;
     flex: 1;
     grid-template-columns: minmax(0, 1fr);
-    gap: 12px;
+    gap: 16px;
     align-items: stretch;
     min-height: 0;
     overflow: hidden;
@@ -536,18 +536,18 @@ select {
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 11px 12px 8px;
+    gap: 16px;
+    padding: 14px 16px 10px;
 }
 
 .table-title h2,
 .detail-heading h2 {
     margin: 0;
-    font: 700 12px var(--font-heading);
+    font: 700 17px var(--font-heading);
 }
 
 .table-title span {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--muted);
 }
 
@@ -555,11 +555,11 @@ select {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 16px;
 }
 
 .table-title .primary-button {
-    padding: 7px 10px;
+    padding: 9px 13px;
     white-space: nowrap;
 }
 
@@ -583,16 +583,16 @@ thead {
 }
 
 th {
-    padding: 8px 9px;
+    padding: 10px 12px;
     text-align: left;
-    font-size: 8px;
+    font-size: 11px;
     font-weight: 600;
 }
 
 td {
-    padding: 9px;
+    padding: 12px;
     border-bottom: 1px solid #edf1f6;
-    font-size: 9px;
+    font-size: 13px;
     color: #718096;
 }
 
@@ -627,12 +627,12 @@ tbody tr[hidden] {
 /* Status badges */
 .status {
     display: inline-block;
-    min-width: 72px;
-    padding: 3px 8px;
+    min-width: 94px;
+    padding: 4px 10px;
     border: 1px solid;
     border-radius: 20px;
     text-align: center;
-    font-size: 8px;
+    font-size: 11px;
     line-height: 1;
 }
 
@@ -672,18 +672,18 @@ tbody tr[hidden] {
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 6px 10px;
+    gap: 5px;
+    padding: 8px 13px;
 }
 
 .pagination button {
-    width: 19px;
-    height: 19px;
+    width: 25px;
+    height: 25px;
     border: 1px solid transparent;
     border-radius: 4px;
     background: #fff;
     color: #8290a5;
-    font-size: 9px;
+    font-size: 13px;
     cursor: pointer;
 }
 
@@ -700,15 +700,15 @@ tbody tr[hidden] {
 /* Outer light-blue panel */
 .detail-card {
     position: absolute;
-    top: 12px;
-    right: 18px;
-    bottom: 14px;
+    top: 16px;
+    right: 23px;
+    bottom: 18px;
     z-index: 20;
     display: flex;
     flex-direction: column;
-    width: min(370px, 38%);
+    width: min(481px, 38%);
     min-width: 0;
-    padding: 8px;
+    padding: 10px;
     overflow: hidden;
     border: 1px solid #dbe6f7;
     border-radius: 8px;
@@ -727,11 +727,11 @@ tbody tr[hidden] {
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
-    padding: 6px 6px 10px;
+    padding: 8px 8px 13px;
 }
 
 .detail-heading h2 {
-    font-size: 14px;
+    font-size: 20px;
     color: #24344d;
 }
 
@@ -739,7 +739,7 @@ tbody tr[hidden] {
     display: none;
     border: 0;
     background: transparent;
-    font-size: 20px;
+    font-size: 28px;
     color: #8794a7;
     cursor: pointer;
 }
@@ -748,7 +748,7 @@ tbody tr[hidden] {
 .detail-body {
     flex: 1;
     min-height: 0;
-    padding: 14px 14px 10px;
+    padding: 18px 18px 13px;
     overflow-y: auto;
     border: 1px solid #e3ebf6;
     border-radius: 6px;
@@ -760,7 +760,7 @@ tbody tr[hidden] {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4px 0 14px;
+    padding: 5px 0 18px;
 }
 
 .avatar {
@@ -768,27 +768,27 @@ tbody tr[hidden] {
 }
 
 .detail-person h3 {
-    margin: 0 0 6px;
+    margin: 0 0 8px;
     text-align: center;
-    font: 700 20px var(--font-heading);
+    font: 700 28px var(--font-heading);
     color: #2b3a52;
 }
 
 .detail-status {
-    font-size: 10px;
+    font-size: 14px;
     color: var(--green);
 }
 
 /* Sections, each with a divider under its heading */
 .detail-section {
-    padding: 10px 0 4px;
+    padding: 13px 0 5px;
 }
 
 .detail-section h4 {
-    margin: 0 0 8px;
-    padding-bottom: 6px;
+    margin: 0 0 10px;
+    padding-bottom: 8px;
     border-bottom: 1px solid #edf1f6;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 700;
     color: #2b3a52;
 }
@@ -796,18 +796,18 @@ tbody tr[hidden] {
 .detail-section p {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin: 8px 0;
-    font-size: 10px;
+    gap: 10px;
+    margin: 10px 0;
+    font-size: 14px;
     line-height: 1.45;
     color: #718096;
     overflow-wrap: anywhere;
 }
 
 .detail-section p i {
-    width: 14px;
-    margin-top: 2px;
-    font-size: 11px;
+    width: 18px;
+    margin-top: 3px;
+    font-size: 15px;
     text-align: center;
     color: #8b99ac;
 }
@@ -817,17 +817,17 @@ tbody tr[hidden] {
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
-    padding: 10px 2px 2px;
+    padding: 13px 3px 3px;
 }
 
 .done-button {
     margin: 0;
-    padding: 9px 34px;
+    padding: 12px 44px;
     border: 1px solid #8fe0b8;
     border-radius: 6px;
     background: #dcf8e9;
     color: #259e68;
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -841,30 +841,30 @@ tbody tr[hidden] {
     }
 
     .page-heading h1 {
-        font-size: 18px;
+        font-size: 25px;
     }
 
     .stat-card {
-        padding: 10px;
+        padding: 13px;
     }
 }
 
 @media (max-width: 900px) and (min-width: 681px) {
     .page-content {
-        padding: 12px;
+        padding: 16px;
     }
 
     .page-heading {
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .stat-card {
-        min-height: 86px;
+        min-height: 112px;
     }
 
     .detail-card {
-        right: 12px;
-        width: min(340px, 48%);
+        right: 16px;
+        width: min(442px, 48%);
     }
 }
 
@@ -933,7 +933,7 @@ tbody tr[hidden] {
     .page-content {
         display: block;
         min-height: 0;
-        padding: 14px 10px;
+        padding: 18px 13px;
         overflow: visible;
     }
 
@@ -942,7 +942,7 @@ tbody tr[hidden] {
     }
 
     .page-heading h1 {
-        font-size: 17px;
+        font-size: 24px;
     }
 
     .primary-button {
@@ -954,7 +954,7 @@ tbody tr[hidden] {
     }
 
     .stat-card {
-        min-height: 88px;
+        min-height: 114px;
     }
 
     .toolbar {
@@ -987,7 +987,7 @@ tbody tr[hidden] {
     }
 
     .table-card {
-        min-height: 280px;
+        min-height: 364px;
     }
 
     .table-title {
@@ -996,12 +996,12 @@ tbody tr[hidden] {
 
     .table-title-actions {
         flex-wrap: wrap;
-        gap: 8px;
+        gap: 10px;
     }
 
     .table-title .primary-button {
-        padding: 7px 8px;
-        font-size: 9px;
+        padding: 9px 10px;
+        font-size: 13px;
     }
 
     /* Details panel goes back into the normal page flow, above the table */
@@ -1025,14 +1025,14 @@ tbody tr[hidden] {
     .detail-person {
         flex-direction: row;
         justify-content: flex-start;
-        gap: 10px;
+        gap: 13px;
     }
 
     .avatar {
         display: grid;
         place-items: center;
-        width: 34px;
-        height: 34px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         background: #e9f1ff;
         color: var(--primary);
@@ -1041,7 +1041,7 @@ tbody tr[hidden] {
     .detail-person h3 {
         margin: 0;
         text-align: left;
-        font-size: 12px;
+        font-size: 17px;
     }
 
     .detail-status {
@@ -1087,7 +1087,7 @@ tbody tr[hidden] {
 /* The mockup shows a red "x" in the corner on desktop too */
 .client-panel .close-detail {
     display: block;
-    font-size: 22px;
+    font-size: 31px;
     line-height: 1;
     color: var(--danger);
 }
@@ -1097,22 +1097,22 @@ tbody tr[hidden] {
 }
 
 .detail-ident h3 {
-    margin-bottom: 2px;
+    margin-bottom: 3px;
 }
 
 .detail-id {
     display: block;
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--muted);
 }
 
 .detail-person {
-    gap: 4px;
+    gap: 5px;
 }
 
 .detail-status {
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
 .detail-status.inactive {
@@ -1131,14 +1131,14 @@ tbody tr[hidden] {
 .info-item {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 7px 0;
+    gap: 13px;
+    padding: 9px 0;
 }
 
 .info-item > i {
-    width: 14px;
-    margin-top: 3px;
-    font-size: 11px;
+    width: 18px;
+    margin-top: 4px;
+    font-size: 15px;
     text-align: center;
     color: #8b99ac;
 }
@@ -1149,13 +1149,13 @@ tbody tr[hidden] {
 
 .info-label {
     display: block;
-    font-size: 9px;
+    font-size: 13px;
     color: var(--muted);
 }
 
 .info-value {
     display: block;
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 500;
     line-height: 1.45;
     color: #41516a;
@@ -1175,8 +1175,8 @@ tbody tr[hidden] {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 10px;
-    padding: 10px 0;
+    gap: 8px 13px;
+    padding: 13px 0;
     border-bottom: 1px solid #edf1f6;
 }
 
@@ -1188,11 +1188,11 @@ tbody tr[hidden] {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: #e9f1ff;
-    font-size: 11px;
+    font-size: 15px;
     color: var(--primary);
 }
 
@@ -1200,42 +1200,42 @@ tbody tr[hidden] {
     display: flex;
     flex: 1;
     flex-direction: column;
-    min-width: 90px;
+    min-width: 117px;
 }
 
 .service-main strong {
-    font-size: 11px;
+    font-size: 15px;
     color: #2b3a52;
 }
 
 .service-main span {
-    font-size: 10px;
+    font-size: 14px;
     color: var(--muted);
 }
 
 .service-meta {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    font-size: 10px;
+    gap: 3px;
+    font-size: 14px;
     color: #718096;
 }
 
 .service-meta i {
-    width: 12px;
-    font-size: 9px;
+    width: 16px;
+    font-size: 13px;
     text-align: center;
     color: #8b99ac;
 }
 
 .service-item .status {
-    min-width: 68px;
+    min-width: 88px;
 }
 
 .service-empty {
-    padding: 14px 0;
+    padding: 18px 0;
     text-align: center;
-    font-size: 10px;
+    font-size: 14px;
     color: var(--muted);
 }
 
@@ -1245,14 +1245,14 @@ tbody tr[hidden] {
 .detail-footer.split {
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .btn {
-    padding: 9px 16px;
+    padding: 12px 21px;
     border: 1px solid;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: filter .15s ease;
@@ -1281,7 +1281,7 @@ tbody tr[hidden] {
 /* Tablet: keep the panel comfortably wide for the buttons */
 @media (max-width: 900px) and (min-width: 681px) {
     .client-panel {
-        width: min(360px, 52%);
+        width: min(468px, 52%);
     }
 }
 
