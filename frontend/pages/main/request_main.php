@@ -200,7 +200,7 @@ foreach ($requests as $request) {
           <!-- TOOLBAR -->
           <div class="requests-toolbar">
 
-            <form class="search" action="requests.php" method="GET">
+            <form class="search" action="request_main.php" method="GET">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="search" name="q" placeholder="Search">
             </form>
@@ -566,41 +566,37 @@ foreach ($requests as $request) {
     var sidebarOverlay = document.getElementById('overlay');
     var menuButton = document.getElementById('menuButton');
 
-    var openSidebar = function() {
-      sidebar.classList.add('open');
-      sidebarOverlay.classList.add('show');
-    };
-
-    var closeSidebar = function() {
-      sidebar.classList.remove('open');
-      sidebarOverlay.classList.remove('show');
+    var setSidebarOpen = function(open) {
+      sidebar.classList.toggle('open', open);
+      sidebarOverlay.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
     };
 
     if (menuButton && sidebar && sidebarOverlay) {
+
       menuButton.addEventListener('click', function() {
-        if (sidebar.classList.contains('open')) {
-          closeSidebar();
-        } else {
-          openSidebar();
-        }
+        setSidebarOpen(!sidebar.classList.contains('open'));
       });
 
-      sidebarOverlay.addEventListener('click', closeSidebar);
+      sidebarOverlay.addEventListener('click', function() {
+        setSidebarOpen(false);
+      });
 
       document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
-          closeSidebar();
+          setSidebarOpen(false);
         }
       });
 
-      // Collapse the sidebar back down if the viewport is resized
-      // past the mobile breakpoint while it's open.
+      // Close the drawer if the window is resized past the mobile breakpoint
       window.addEventListener('resize', function() {
-        if (window.innerWidth > 900) {
-          closeSidebar();
+        if (!window.matchMedia('(max-width: 900px)').matches) {
+          setSidebarOpen(false);
         }
       });
+
     }
+
 
     // -------------------- Request list + detail panel --------------------
     var list = document.getElementById('requestList');

@@ -908,21 +908,19 @@ select {
 
 .modal-overlay {
   display: none;
-
   position: fixed;
-
   inset: 0;
 
   align-items: center;
-
   justify-content: center;
 
   padding: 24px 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
-  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
 
   background: rgba(30, 41, 63, 0.55);
-
   z-index: 100;
 }
 
@@ -934,22 +932,38 @@ select {
   position: relative;
 
   width: 100%;
-
   max-width: 760px;
 
-  display: flex;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
 
+  min-height: 0;
+
+  display: flex;
   flex-direction: column;
 
+  overflow: hidden;
+
   background: var(--white);
-
   border-radius: var(--radius-md);
-
   box-shadow: 0 20px 60px rgba(20, 30, 50, 0.25);
 }
 
 .modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+
   padding: 30px 30px 8px;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.modal-footer {
+  flex-shrink: 0;
 }
 
 .modal-close {

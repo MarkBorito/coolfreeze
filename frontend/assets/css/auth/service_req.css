@@ -73,7 +73,7 @@
 .sr-table-card h2 { margin: 0; padding: 14px 24px 10px; font-size: 22px; font-weight: 700; }
 .sr-table-wrap { overflow-x: auto; }
 .sr-table { width: 100%; border-collapse: collapse; min-width: 720px; }
-.sr-table thead th { background: var(--sr-navy); color: var(--sr-navy-muted); text-align: left; font-size: 14px; font-weight: 600; padding: 11px 24px; }
+.sr-table thead th { background: #1f5fe0; color: #ffffff; text-align: left; font-size: 14px; font-weight: 600; padding: 11px 24px; }
 .sr-table td { padding: 17px 24px; font-size: 15px; color: var(--sr-text-muted); border-bottom: 1px solid transparent; }
 .sr-table td small { color: var(--sr-blue); font-weight: 600; }
 .sr-center { text-align: center !important; }

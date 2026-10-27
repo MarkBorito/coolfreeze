@@ -244,15 +244,7 @@ if (!function_exists('h')) {
                         </table>
                     </div>
 
-                    <div class="pagination">
-                        <button aria-label="Previous page">‹</button>
-                        <button class="current">1</button>
-                        <button>2</button>
-                        <button>3</button>
-                        <button>4</button>
-                        <button>5</button>
-                        <button aria-label="Next page">›</button>
-                    </div>
+                    <div class="pagination" id="pagination" aria-label="Pagination"></div>
                 </section>
 
                 <!-- Client panel: Profile Information / Service History -->
@@ -407,7 +399,7 @@ function updateStats() {
 // ---------------------------------------------------------------
 // Search, filter and sort
 // ---------------------------------------------------------------
-function refreshRows() {
+function refreshRows(keepPage) {
     const rows  = [...rowsContainer.querySelectorAll('tr')];
     const query = searchInput.value.trim().toLowerCase();
 
@@ -427,12 +419,95 @@ function refreshRows() {
         const matchesStatus = statusFilter.value === 'all'
             || row.dataset.status === statusFilter.value;
 
-        row.hidden = !(matchesText && matchesStatus);
+        row.dataset.match = (matchesText && matchesStatus) ? '1' : '0';
         rowsContainer.appendChild(row);
     });
 
-    const visibleCount = rows.filter(row => !row.hidden).length;
+    const visibleCount = rows.filter(row => row.dataset.match === '1').length;
     resultCount.textContent = visibleCount + (visibleCount === 1 ? ' client' : ' clients');
+
+    paginate(keepPage === true);
+}
+
+//pagination
+const ROWS_PER_PAGE = 4;
+const paginationEl  = document.getElementById('pagination');
+let currentPage     = 1;
+
+function goToPage(page) {
+    currentPage = page;
+    paginate(true);
+}
+
+function pageButton(label, page, { aria = '', disabled = false, current = false } = {}) {
+    const button = document.createElement('button');
+    button.type        = 'button';
+    button.textContent = label;
+    button.disabled    = disabled;
+
+    if (aria) button.setAttribute('aria-label', aria);
+    if (current) {
+        button.className = 'current';
+        button.setAttribute('aria-current', 'page');
+    }
+
+    button.addEventListener('click', () => goToPage(page));
+    return button;
+}
+
+function renderPagination(totalPages) {
+    paginationEl.replaceChildren();
+
+    paginationEl.append(pageButton('‹', currentPage - 1, {
+        aria: 'Previous page',
+        disabled: currentPage === 1
+    }));
+
+    // Show every page when there are few; otherwise 1 … current-1 current current+1 … last
+    const items = [];
+    for (let page = 1; page <= totalPages; page++) {
+        const near = Math.abs(page - currentPage) <= 1;
+        if (totalPages <= 7 || page === 1 || page === totalPages || near) {
+            items.push(page);
+        } else if (items[items.length - 1] !== '…') {
+            items.push('…');
+        }
+    }
+
+    items.forEach(item => {
+        if (item === '…') {
+            const gap = document.createElement('span');
+            gap.className   = 'page-gap';
+            gap.textContent = '…';
+            paginationEl.append(gap);
+        } else {
+            paginationEl.append(pageButton(item, item, {
+                aria: 'Page ' + item,
+                current: item === currentPage
+            }));
+        }
+    });
+
+    paginationEl.append(pageButton('›', currentPage + 1, {
+        aria: 'Next page',
+        disabled: currentPage === totalPages
+    }));
+}
+
+// Shows only the rows of the current page (among rows that match search/filter)
+function paginate(keepPage = false) {
+    const allRows = [...rowsContainer.querySelectorAll('tr')];
+    const matched = allRows.filter(row => row.dataset.match !== '0');
+    const totalPages = Math.max(1, Math.ceil(matched.length / ROWS_PER_PAGE));
+
+    currentPage = keepPage ? Math.min(Math.max(currentPage, 1), totalPages) : 1;
+
+    const start    = (currentPage - 1) * ROWS_PER_PAGE;
+    const pageRows = new Set(matched.slice(start, start + ROWS_PER_PAGE));
+
+    allRows.forEach(row => { row.hidden = !pageRows.has(row); });
+
+    renderPagination(totalPages);
 }
 
 searchInput.addEventListener('input', refreshRows);
@@ -460,9 +535,6 @@ function renderProfile(client) {
     toggleButton.textContent = client.status === 'Active' ? 'Deactivate' : 'Activate';
 }
 
-// ---------------------------------------------------------------
-// Panel: service history view
-// ---------------------------------------------------------------
 function renderServices(services) {
     serviceList.replaceChildren();
 
@@ -577,7 +649,7 @@ toggleButton.addEventListener('click', () => {
 
     renderProfile(currentClient);
     updateStats();
-    refreshRows();
+    refreshRows(true);
 });
 
 // ---------------------------------------------------------------
@@ -586,6 +658,11 @@ toggleButton.addEventListener('click', () => {
 document.getElementById('menuButton')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
 });
+
+// ---------------------------------------------------------------
+// First load: show page 1
+// ---------------------------------------------------------------
+paginate();
 </script>
 </body>
 </html>
