@@ -154,9 +154,22 @@ function sr_notes(array $r): void
           <div class="sr-alert sr-alert--<?= e($flash['type']) ?>" role="alert"><?= e($flash['text']) ?></div>
         <?php endif; ?>
 
-        <nav class="sr-breadcrumb" aria-label="Breadcrumb">Service Management &gt; Service Request</nav>
-        <h1 class="sr-heading">Manage your <span>Service Request!</span></h1>
-        <p class="sr-subtitle">Manage your Client’s Inquiries</p>
+        <div class="page-header">
+
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="<?= BASE_URL ?>frontend/pages/admin/admin_home.php">Service Management</a>
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            <span>Service Request</span>
+          </nav>
+
+          <h1 class="page-title">
+            Manage your
+            <span>Service Request!</span>
+          </h1>
+
+          <p class="page-subtitle">Manage your Client’s Inquiries</p>
+
+        </div>
 
         <!-- STATISTICS -->
         <div class="sr-stats">
