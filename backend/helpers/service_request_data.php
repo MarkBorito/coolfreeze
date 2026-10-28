@@ -1,152 +1,204 @@
 <?php
 /**
- * Service Request data layer (ARRAY-ONLY).
+ * Service Request data layer (MySQL).
  *
- * Every function here is a "repository" function. When you move to MySQL,
- * rewrite ONLY the bodies of these functions (keep names + return shapes)
- * and the logic file + page keep working.
+ * These functions read the real database tables, but they return the SAME
+ * array shapes the admin Service Request page already uses, so the page
+ * markup did not have to change.
  *
- * NOTE: ordinary PHP arrays are rebuilt on every HTTP request. Changes made
- * here live only for the current request. Nothing is saved permanently.
+ * Saving changes (confirm / reject) is done in backend/models/request.php.
  */
+require_once __DIR__ . '/../models/request.php';
 
-/** In-memory store, built once per request. Returned by reference. */
-function &sr_store(): array
+/** Database status ("On going") -> the lowercase key the page uses ("ongoing"). */
+function sr_status_to_key(string $dbStatus): string
 {
-    static $store = null;
-
-    if ($store === null) {
-        $catalog = [
-            'cleaning'    => ['name' => 'AC Cleaning',       'icon' => 'fa-fan',                  'price' => 800],
-            'repair'      => ['name' => 'AC Repair',         'icon' => 'fa-screwdriver-wrench',   'price' => 1000],
-            'install'     => ['name' => 'AC Install',        'icon' => 'fa-snowflake',            'price' => 1500],
-            'maintenance' => ['name' => 'Maintenance',       'icon' => 'fa-wrench',               'price' => 600],
-            'parts'       => ['name' => 'Parts Replacement', 'icon' => 'fa-gears',                'price' => 900],
-        ];
-
-        $make = function (
-            string $id, string $name, string $phone, string $email, array $serviceKeys,
-            string $address, string $date, string $start, string $end, string $notes,
-            string $status, array $techIds = []
-        ) use ($catalog): array {
-            return [
-                'id'                      => $id,
-                'client'                  => ['name' => $name, 'phone' => $phone, 'email' => $email],
-                'services'                => array_map(fn ($k) => $catalog[$k], $serviceKeys),
-                'address'                 => $address,
-                'date'                    => $date,   // ISO Y-m-d
-                'start_time'              => $start,  // H:i
-                'end_time'                => $end,
-                'notes'                   => $notes,
-                'status'                  => $status, // pending|confirmed|ongoing|cancelled|completed
-                'assigned_technician_ids' => $techIds,
-            ];
-        };
-
-        $rows = [
-            $make('SR-000125', 'JuanTzy', '0999-999-9999', 'Juandelacruz@gmail.com', ['cleaning', 'repair'],
-                '123K Anya Kanya St., Brgy. SaanMoShaDalahen', '2026-09-15', '09:00', '10:00',
-                'Aircon is leaking and needs cleaning.', 'pending'),
-            $make('SR-000124', 'Rodrigo Duterte', '0917-111-2222', 'rodrigo@example.com', ['repair'],
-                '45 Mabini St., Brgy. Poblacion', '2026-09-14', '13:00', '15:00', 'Not cooling properly.', 'confirmed', ['T-002']),
-            $make('SR-000123', 'Baste Duterte', '0917-222-3333', 'baste@example.com', ['install'],
-                '8 Rizal Ave., Brgy. San Roque', '2026-09-13', '08:00', '11:00', 'New split-type unit.', 'ongoing', ['T-001']),
-            $make('SR-000122', 'Kitty Duterte', '0917-333-4444', 'kitty@example.com', ['maintenance'],
-                '17 Bonifacio St., Brgy. Central', '2026-09-13', '10:00', '11:00', 'Routine maintenance.', 'cancelled'),
-            $make('SR-000121', 'Sarah Duterte', '0917-444-5555', 'sarah@example.com', ['parts'],
-                '22 Luna St., Brgy. Bagong Silang', '2026-09-12', '09:00', '10:00', 'Replace compressor fan.', 'completed', ['T-003']),
-            $make('SR-000120', 'Sarah Duterte', '0917-444-5555', 'sarah@example.com', ['parts'],
-                '22 Luna St., Brgy. Bagong Silang', '2026-09-12', '11:00', '12:00', 'Replace thermostat.', 'completed', ['T-003']),
-            $make('SR-000119', 'Sarah Duterte', '0917-444-5555', 'sarah@example.com', ['parts'],
-                '22 Luna St., Brgy. Bagong Silang', '2026-09-12', '13:00', '14:00', 'Replace filter.', 'completed', ['T-005']),
-            $make('SR-000118', 'Ana Lopez', '0918-555-6666', 'ana@example.com', ['cleaning'],
-                '5 Sampaguita St., Brgy. Maligaya', '2026-09-16', '09:00', '10:00', 'Yearly cleaning.', 'pending'),
-            $make('SR-000117', 'Ben Torres', '0918-666-7777', 'ben@example.com', ['repair'],
-                '90 Narra St., Brgy. Pag-asa', '2026-09-17', '14:00', '16:00', 'Strange noise from unit.', 'pending'),
-            $make('SR-000116', 'Carla Mendoza', '0918-777-8888', 'carla@example.com', ['maintenance'],
-                '31 Acacia St., Brgy. Holy Spirit', '2026-09-11', '10:00', '12:00', 'Quarterly maintenance.', 'confirmed', ['T-004']),
-            $make('SR-000115', 'Lara Cruz', '0918-888-9999', 'lara@example.com', ['install'],
-                '12 Molave St., Brgy. Commonwealth', '2026-09-18', '08:00', '12:00', 'Two units to install.', 'pending'),
-            $make('SR-000114', 'Marco Santos', '0919-123-4567', 'marco@example.com', ['cleaning'],
-                '66 Kamias Rd., Brgy. Kamuning', '2026-09-10', '09:00', '10:00', 'Dusty vents.', 'completed', ['T-006']),
-            $make('SR-000113', 'Noel Garcia', '0919-234-5678', 'noel@example.com', ['repair'],
-                '3 Mahogany St., Brgy. Batasan', '2026-09-09', '15:00', '16:00', 'Customer cancelled.', 'cancelled'),
-            $make('SR-000112', 'Pia Reyes', '0919-345-6789', 'pia@example.com', ['maintenance'],
-                '78 Ipil St., Brgy. Fairview', '2026-09-19', '13:00', '14:00', 'Check refrigerant level.', 'pending'),
-        ];
-
-        $requests = [];
-        foreach ($rows as $row) {
-            $requests[$row['id']] = $row; // keyed by unique ID
-        }
-
-        $store = [
-            'requests'    => $requests,
-            'technicians' => [
-                'T-001' => ['id' => 'T-001', 'name' => 'Bernardo, Mikha C.',        'availability' => 'available'],
-                'T-002' => ['id' => 'T-002', 'name' => 'Borito, Mark Adrian A.',     'availability' => 'available'],
-                'T-003' => ['id' => 'T-003', 'name' => 'Esguerra, Mark Lawrence L.', 'availability' => 'available'],
-                'T-004' => ['id' => 'T-004', 'name' => 'Legaspi, Matt Lainier O.',   'availability' => 'available'],
-                'T-005' => ['id' => 'T-005', 'name' => 'Quizon, Richmond A.',        'availability' => 'available'],
-                'T-006' => ['id' => 'T-006', 'name' => 'Repol, Christian Paul R.',   'availability' => 'unavailable'],
-            ],
-        ];
-    }
-
-    return $store;
+    return $dbStatus === 'On going' ? 'ongoing' : strtolower($dbStatus);
 }
 
+/** "SR-000125" -> 125. Returns 0 if the text is not a valid request ID. */
+function sr_id_to_int(string $id): int
+{
+    return preg_match('/^SR-(\d{6})$/', $id, $m) ? (int) $m[1] : 0;
+}
+
+/** "9:00 AM - 10:00 AM" -> ['09:00', '10:00'] (the page formats these itself). */
+function sr_split_time_slot(string $slot): array
+{
+    $parts = explode('-', $slot);
+    $start = strtotime(trim($parts[0] ?? ''));
+    $end   = strtotime(trim($parts[1] ?? ''));
+
+    $startText = $start ? date('H:i', $start) : '00:00';
+    $endText   = $end   ? date('H:i', $end)   : $startText;
+    return [$startText, $endText];
+}
+
+/** Every service request, newest first, in the shape the page expects. */
 function request_get_all(): array
 {
-    $store = &sr_store();
-    return array_values($store['requests']);
+    global $conn;
+
+    $rows = $conn->query(
+        'SELECT r.request_id, r.status, r.preferred_date, r.preferred_time,
+                r.scheduled_date, r.scheduled_time, r.service_address, r.notes,
+                r.contact_name, r.contact_phone, u.email
+         FROM service_requests r
+         JOIN customers c ON c.customer_id = r.customer_id
+         JOIN users u     ON u.user_id = c.user_id
+         ORDER BY r.request_id DESC'
+    )->fetch_all(MYSQLI_ASSOC);
+
+    // All service lines, grouped by request
+    $servicesByRequest = [];
+    $items = $conn->query(
+        'SELECT i.request_id, s.name, s.icon, (i.unit_price * i.quantity) AS price
+         FROM request_items i
+         JOIN services s ON s.service_id = i.service_id
+         ORDER BY i.item_id'
+    )->fetch_all(MYSQLI_ASSOC);
+    foreach ($items as $it) {
+        $servicesByRequest[$it['request_id']][] = [
+            'name'  => $it['name'],
+            'icon'  => $it['icon'] ?: 'fa-snowflake',
+            'price' => (float) $it['price'],
+        ];
+    }
+
+    // Assigned technician IDs, grouped by request (lead technician first)
+    $techsByRequest = [];
+    $assigned = $conn->query(
+        'SELECT request_id, technician_id FROM request_technicians ORDER BY is_lead DESC, assignment_id'
+    )->fetch_all(MYSQLI_ASSOC);
+    foreach ($assigned as $a) {
+        $techsByRequest[$a['request_id']][] = (string) $a['technician_id'];
+    }
+
+    $result = [];
+    foreach ($rows as $r) {
+        $rid  = $r['request_id'];
+        $date = $r['scheduled_date'] ?: $r['preferred_date'];
+        $slot = $r['scheduled_time'] ?: $r['preferred_time'];
+        [$start, $end] = sr_split_time_slot($slot);
+
+        $result[] = [
+            'id'     => request_number((int) $rid),
+            'client' => [
+                'name'  => (string) $r['contact_name'],
+                'phone' => (string) $r['contact_phone'],
+                'email' => (string) $r['email'],
+            ],
+            // A request should always have items; the fallback only protects the page from crashing
+            'services'                => $servicesByRequest[$rid] ?? [['name' => '(no service)', 'icon' => 'fa-snowflake', 'price' => 0.0]],
+            'address'                 => (string) $r['service_address'],
+            'date'                    => $date,
+            'start_time'              => $start,
+            'end_time'                => $end,
+            'notes'                   => (string) $r['notes'],
+            'status'                  => sr_status_to_key($r['status']),
+            'assigned_technician_ids' => $techsByRequest[$rid] ?? [],
+        ];
+    }
+    return $result;
 }
 
+/** One request by its "SR-000125" ID, or null. */
 function request_find_by_id(string $id): ?array
 {
-    $store = &sr_store();
-    return $store['requests'][$id] ?? null;
-}
-
-function request_update_status(string $id, string $status): bool
-{
-    $store = &sr_store();
-    if (!isset($store['requests'][$id])) {
-        return false;
+    foreach (request_get_all() as $request) {
+        if ($request['id'] === $id) {
+            return $request;
+        }
     }
-    $store['requests'][$id]['status'] = $status;
-    return true;
+    return null;
 }
 
-function request_assign_technicians(string $id, array $technicianIds): bool
-{
-    $store = &sr_store();
-    if (!isset($store['requests'][$id])) {
-        return false;
-    }
-    $store['requests'][$id]['assigned_technician_ids'] = array_values(array_unique($technicianIds));
-    return true;
-}
-
+/** All technicians. The page shows only 'available' ones as selectable. */
 function technician_get_all(): array
 {
-    $store = &sr_store();
-    return array_values($store['technicians']);
+    global $conn;
+
+    $rows = $conn->query(
+        'SELECT technician_id, full_name, availability FROM technicians ORDER BY full_name'
+    )->fetch_all(MYSQLI_ASSOC);
+
+    return array_map(fn ($t) => [
+        'id'           => (string) $t['technician_id'],
+        'name'         => $t['full_name'],
+        'availability' => $t['availability'],   // available | on_job | off_duty
+    ], $rows);
 }
 
+/** One technician by ID (the ID arrives from the form as text), or null. */
 function technician_find_by_id(string $id): ?array
 {
-    $store = &sr_store();
-    return $store['technicians'][$id] ?? null;
+    global $conn;
+
+    $techId = (int) $id;
+    $stmt = $conn->prepare(
+        'SELECT technician_id, full_name, availability FROM technicians WHERE technician_id = ? LIMIT 1'
+    );
+    $stmt->bind_param('i', $techId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$row) {
+        return null;
+    }
+    return [
+        'id'           => (string) $row['technician_id'],
+        'name'         => $row['full_name'],
+        'availability' => $row['availability'],
+    ];
 }
 
+/**
+ * Technicians who already hold a Confirmed / On going visit, grouped by visit date and slot start.
+ * Returns ['2026-11-03|09:00' => ['4', '7'], ...].
+ * Every booking is one fixed 1-hour slot, so "same date + same slot" is the only clash there is.
+ */
+function technician_busy_map(): array
+{
+    global $conn;
+
+    $rows = $conn->query(
+        "SELECT rt.technician_id,
+                COALESCE(r.scheduled_date, r.preferred_date) AS visit_date,
+                COALESCE(r.scheduled_time, r.preferred_time) AS visit_slot
+         FROM request_technicians rt
+         JOIN service_requests r ON r.request_id = rt.request_id
+         WHERE r.status IN ('Confirmed', 'On going')"
+    )->fetch_all(MYSQLI_ASSOC);
+
+    $map = [];
+    foreach ($rows as $row) {
+        [$start] = sr_split_time_slot((string) $row['visit_slot']);
+        $map[$row['visit_date'] . '|' . $start][] = (string) $row['technician_id'];
+    }
+    return $map;
+}
+
+/** True if this technician already has a job at the same date and slot as $request (a request_get_all() record). */
+function technician_is_busy(array $busyMap, array $request, string $technicianId): bool
+{
+    return in_array($technicianId, $busyMap[$request['date'] . '|' . $request['start_time']] ?? [], true);
+}
+
+/** Numbers for the four cards at the top of the page. */
 function request_get_statistics(): array
 {
+    global $conn;
+
     $stats = ['all' => 0, 'pending' => 0, 'confirmed' => 0, 'completed' => 0];
-    foreach (request_get_all() as $r) {
-        $stats['all']++;
-        if (isset($stats[$r['status']])) {
-            $stats[$r['status']]++;
+
+    $rows = $conn->query('SELECT status, COUNT(*) AS total FROM service_requests GROUP BY status')
+                 ->fetch_all(MYSQLI_ASSOC);
+    foreach ($rows as $row) {
+        $stats['all'] += (int) $row['total'];
+        $key = sr_status_to_key($row['status']);
+        if (isset($stats[$key])) {
+            $stats[$key] += (int) $row['total'];
         }
     }
     return $stats;

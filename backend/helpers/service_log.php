@@ -1,7 +1,8 @@
 <?php
 /**
- * Service Request business logic. Uses ONLY the repository functions in
- * service_requests_data.php, so it keeps working after a MySQL swap.
+ * Service Request business logic (checks and messages).
+ * Reads data through service_request_data.php and saves confirm / reject
+ * through the transaction functions in models/request.php.
  */
 require_once __DIR__ . '/service_request_data.php';
 
@@ -42,7 +43,7 @@ function sr_evaluation_label(string $status): string
 function sr_date_short(string $iso): string { return date('M j', strtotime($iso)); }
 function sr_date_long(string $iso): string  { return date('F j, Y', strtotime($iso)); }
 function sr_time(string $hm): string        { return date('g:ia', strtotime('2000-01-01 ' . $hm)); }
-function sr_peso(int $amount): string       { return '₱' . number_format($amount); }
+function sr_peso(float $amount): string     { return '₱' . number_format($amount); }
 
 function sr_is_valid_request_id(string $id): bool
 {
@@ -117,7 +118,7 @@ function sr_validate_technician_ids(array $rawIds): array
 {
     $ids = [];
     foreach ($rawIds as $raw) {
-        if (!is_string($raw)) {
+        if (!is_string($raw) || !ctype_digit($raw)) {
             return [[], 'Invalid technician selection.'];
         }
         $ids[$raw] = $raw; // keys remove duplicates
@@ -132,7 +133,7 @@ function sr_validate_technician_ids(array $rawIds): array
         if ($tech === null) {
             return [[], 'One of the selected technicians does not exist.'];
         }
-        if ($tech['availability'] !== 'available') {
+        if ($tech['availability'] !== 'available') {   // on_job or off_duty
             return [[], $tech['name'] . ' is not available.'];
         }
     }
@@ -152,8 +153,13 @@ function sr_reject_request(string $id): array
     if (!sr_request_is_pending($request)) {
         return [false, "Request $id has already been processed and cannot be rejected."];
     }
-    request_assign_technicians($id, []); // rejected requests never keep technicians
-    request_update_status($id, 'cancelled');
+
+    global $conn;
+    $adminId = (int) ($_SESSION['admin_id'] ?? 0);
+    if (!request_reject_by_admin($conn, sr_id_to_int($id), $adminId)) {
+        // Someone else processed it between the check above and the save
+        return [false, "Request $id has already been processed and cannot be rejected."];
+    }
     return [true, "Request $id was rejected and marked as Cancelled."];
 }
 
@@ -174,7 +180,16 @@ function sr_confirm_request(string $id, array $rawTechnicianIds): array
     if ($error !== null) {
         return [false, $error];
     }
-    request_assign_technicians($id, $ids);
-    request_update_status($id, 'confirmed');
+
+    global $conn;
+    $adminId = (int) ($_SESSION['admin_id'] ?? 0);
+    try {
+        $saved = request_confirm_by_admin($conn, sr_id_to_int($id), $adminId, $ids);
+    } catch (TechnicianClashException $e) {
+        return [false, $e->getMessage()];   // already rolled back, nothing was saved
+    }
+    if (!$saved) {
+        return [false, "Request $id has already been processed and cannot be confirmed again."];
+    }
     return [true, "Request $id confirmed with " . count($ids) . ' technician(s).'];
 }
