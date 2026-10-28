@@ -331,9 +331,9 @@ select {
     flex: 1;
     flex-direction: column;
     width: 100%;
-    max-width: 1500px;
+    max-width: none;
     min-height: 0;
-    margin: 0 auto;
+    margin: 0;
     padding: 21px 23px 18px;
     overflow: hidden;
 }
