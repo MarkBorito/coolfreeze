@@ -3678,24 +3678,7 @@ select {
   color: var(--text);
 }
 
-/* =========================================================
-   RESPONSIVE
-   ---------------------------------------------------------
-   Merged from dashboardui.css, servicesmain.css and
-   requestpage.css. Keep this block at the very END of the
-   file and keep the breakpoints ordered largest -> smallest,
-   so the smaller screen always wins when rules overlap.
 
-     1100px  tablet
-      900px  sidebar turns into a slide-in drawer
-      700px  mobile
-      420px  very small phones
-
-   Left out on purpose:
-   - overflow / fixed-height rules that only existed to lock
-     the Services page to one screen. The page now scrolls
-     normally, so nothing can be cut off.
-========================================================= */
 
 /* ---------- Large desktop ---------- */
 

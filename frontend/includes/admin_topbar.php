@@ -35,10 +35,6 @@ $headerPagesUrl = BASE_URL;
   <!-- TOP ACTIONS -->
   <div class="top-actions">
 
-    <a href="<?= e($headerPagesUrl) ?>notifications.php" class="icon-link" aria-label="Notifications">
-      <i class="fa-solid fa-bell"></i>
-    </a>
-
     <a href="<?= e($headerPagesUrl) ?>?page=profile_main" class="profile-link">
       <i class="fa-solid fa-user"></i>
       <span><?= e($userName) ?></span>
