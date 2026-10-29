@@ -1,4 +1,24 @@
 /logs/
+<<<<<<< HEAD
+
+# Composer dependencies
+/vendor/
+
+# Private credentials
+/backend/config/secrets.php
+
+# Environment variables
+.env
+.env.*
+
+# Logs
+/backend/logs/*.log
+
+# Temporary files
+*.tmp
+
+*.log
+=======
 *.log
 
 /vendor
@@ -9,3 +29,4 @@
 .env.*
 
 /backend/logs/*.log
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456

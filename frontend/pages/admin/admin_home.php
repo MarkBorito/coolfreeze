@@ -8,11 +8,31 @@ $userName = $_SESSION['username'] ?? 'Admin';
 $currentPage = 'admin_home';
 
 /* ============================================================
- * SAMPLE DATA (arrays only)
- * Later, replace each array with results from MySQL.
- * Keep the same keys and the HTML below will not need changes.
+ * DATA FROM MYSQL (see backend/models/dashboard.php)
+ * Same array keys the page always used, so the HTML below is unchanged.
  * ============================================================ */
 
+<<<<<<< HEAD
+require_once BACKEND_PATH . '/models/dashboard.php';
+
+// Safe defaults, so the page still opens if a query fails
+$dashboardStats  = ['pending_requests' => 0, 'confirmed_requests' => 0, 'ongoing_services' => 0, 'completed_services' => 0];
+$recentRequests  = [];
+$technicianStats = ['available' => 0, 'assigned' => 0, 'off_duty' => 0];
+$todaySchedule   = [];
+
+try {
+    $dashboardStats  = dashboard_request_counts($conn);
+    $recentRequests  = dashboard_recent_requests($conn, 4);
+    $technicianStats = dashboard_technician_counts($conn);
+    $todaySchedule   = dashboard_today_schedule($conn);
+} catch (Throwable $e) {
+    error_log($e->getMessage());
+    if (APP_ENV === 'local') {
+        throw $e;   // while testing in XAMPP, show the real error instead of hiding it
+    }
+}
+=======
 // REAL DATA: same source as the Service Request page (request_get_all / request_get_statistics)
 $requestStats = admin_request_stats($conn);
 $dashboardStats = [
@@ -39,6 +59,7 @@ $technicianStats = admin_technician_stats(admin_technician_overview($conn));
 // backend/api/Admin/dashboard.php (see frontend/assets/js/admin_home_live.js).
 $todaySchedule = admin_today_schedule($conn);
 $scheduleEndpoint = BASE_URL . 'backend/api/Admin/dashboard.php?action=schedule';
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 
 /* ============================================================
  * PRESENTATION HELPERS / CONFIG
@@ -59,6 +80,7 @@ if (!function_exists('cf_status_class')) {
             'Pending'   => 'pending',
             'Confirmed' => 'confirmed',
             'On going'  => 'ongoing',
+            'Completed' => 'confirmed',   // no separate completed colour in the stylesheet, so use the green one
             'Cancelled' => 'cancelled',
         ];
         return $map[$status] ?? 'pending';
@@ -83,8 +105,13 @@ $summaryCards = [
     ['key' => 'completed_services', 'label' => 'Completed Services', 'icon' => 'fa-solid fa-desktop',          'color' => 'completed'],
 ];
 
+<<<<<<< HEAD
+// "View all" targets (the pages are opened through index.php)
+$requestsUrl    = BASE_URL . '?page=admin_requests';
+=======
 // "View all" targets. TODO: change to your real admin page filenames.
 $requestsUrl   = BASE_URL . '?page=admin_requests';
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 $techniciansUrl = BASE_URL . '?page=admin_technicians';
 ?>
 

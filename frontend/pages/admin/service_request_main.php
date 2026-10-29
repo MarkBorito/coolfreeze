@@ -17,13 +17,34 @@ $currentPage = 'admin_requests'; // matches the 'key' in admin_sidebar.php
 $adminId = (int) $_SESSION['admin_id'];
 
 /* ---------- 1. Handle POST (state-changing) BEFORE any HTML ---------- */
+<<<<<<< HEAD
+// The message from the last action is kept in the session, shown once, then removed
 $flash = $_SESSION['sr_flash'] ?? null; // ['type' => 'success'|'error', 'text' => '...']
 unset($_SESSION['sr_flash']);
+$redirectAfterPost = false;
+=======
+$flash = $_SESSION['sr_flash'] ?? null; // ['type' => 'success'|'error', 'text' => '...']
+unset($_SESSION['sr_flash']);
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action    = (string) ($_POST['action'] ?? '');
     $requestId = trim((string) ($_POST['request_id'] ?? ''));
 
+<<<<<<< HEAD
+    try {
+        if ($action === 'confirm') {
+            $techIds = isset($_POST['tech_ids']) && is_array($_POST['tech_ids']) ? $_POST['tech_ids'] : [];
+            [$ok, $msg] = sr_confirm_request($requestId, $techIds);
+        } elseif ($action === 'reject') {
+            if (($_POST['confirm_reject'] ?? '') !== '1') {
+                [$ok, $msg] = [false, 'Rejection must be confirmed.'];
+            } else {
+                [$ok, $msg] = sr_reject_request($requestId);
+            }
+        } else {
+            [$ok, $msg] = [false, 'Unknown action.'];
+=======
     if ($action === 'confirm') {
         $techIds = isset($_POST['tech_ids']) && is_array($_POST['tech_ids']) ? $_POST['tech_ids'] : [];
         [$ok, $msg] = sr_confirm_request($adminId, $requestId, $techIds);
@@ -33,10 +54,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $reason = mb_substr(trim((string) ($_POST['reason'] ?? '')), 0, 255);
             [$ok, $msg] = sr_reject_request($adminId, $requestId, $reason === '' ? null : $reason);
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
         }
-    } else {
-        [$ok, $msg] = [false, 'Unknown action.'];
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        [$ok, $msg] = [false, 'Something went wrong. Please try again.'];
     }
+<<<<<<< HEAD
+    $_SESSION['sr_flash'] = ['type' => $ok ? 'success' : 'error', 'text' => $msg];
+    $redirectAfterPost = true;   // redirect after the filters below are read, so the same page stays open
+=======
     // Post/Redirect/Get: a refresh must not re-submit the form
     $_SESSION['sr_flash'] = ['type' => $ok ? 'success' : 'error', 'text' => $msg];
     header('Location: ' . BASE_URL . '?' . http_build_query(array_filter([
@@ -47,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'pg'     => (string) ($_GET['pg'] ?? ''),
     ], fn ($v) => $v !== '')));
     exit;
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 }
 
 /* ---------- 2. GET filters (whitelisted) ---------- */
@@ -60,8 +88,15 @@ $statusParam  = (string) ($_GET['status'] ?? 'all');
 $statusFilter = ($statusParam === 'all' || isset($statusOptions[$statusParam])) ? $statusParam : 'all';
 $pageNumber   = max(1, (int) ($_GET['pg'] ?? 1));
 
+// Post/Redirect/Get: after a save, reload the page so a browser refresh cannot resubmit the form
+if ($redirectAfterPost) {
+    header('Location: ' . BASE_URL . sr_url());
+    exit;
+}
+
 $requests    = request_get_all();
 $technicians = technician_get_all();
+$busyMap     = technician_busy_map();
 $statistics  = request_get_statistics();
 $visible     = sr_sort_requests(sr_filter_requests($requests, $searchQuery, $statusFilter), $sortOption);
 $perPage     = 4; // rows per page
@@ -324,11 +359,14 @@ function sr_notes(array $r): void
               <div class="sr-techbox">
                 <h4>Select technician</h4>
                 <div class="sr-techhead"><span>Name</span><span>Status</span></div>
-                <?php foreach ($technicians as $t): $avail = $t['availability'] === 'available'; ?>
+                <?php foreach ($technicians as $t):
+                  // Busy = already Confirmed / On going at this request's date and time slot
+                  $busy  = $t['availability'] === 'available' && technician_is_busy($busyMap, $r, $t['id']);
+                  $avail = $t['availability'] === 'available' && !$busy; ?>
                   <label class="sr-techrow <?= $avail ? '' : 'is-disabled' ?>">
                     <input type="checkbox" name="tech_ids[]" value="<?= e($t['id']) ?>" data-name="<?= e($t['name']) ?>" <?= $avail ? '' : 'disabled' ?>>
                     <span class="sr-techname"><?= e($t['name']) ?></span>
-                    <span class="sr-avail sr-avail--<?= $avail ? 'yes' : 'no' ?>"><?= $avail ? 'Available' : 'Unavailable' ?></span>
+                    <span class="sr-avail sr-avail--<?= $avail ? 'yes' : 'no' ?>"><?= $avail ? 'Available' : ($busy ? 'Booked' : 'Unavailable') ?></span>
                   </label>
                 <?php endforeach; ?>
                 <div class="sr-selected"><strong>Selected:</strong> <span data-sr-selected><em>None</em></span></div>

@@ -152,19 +152,29 @@
 .sr-reject-box input[type="text"] { width: 100%; box-sizing: border-box; margin: 0 0 10px; padding: 9px 12px; border: 1px solid var(--sr-red); border-radius: var(--sr-radius-sm); font: inherit; font-size: 14px; background: #fff; }
 .sr-reject-box .sr-btn { height: 38px; font-size: 15px; min-width: 100px; }
 
-@media (max-width: 1100px) {
-  .sr-stats { grid-template-columns: repeat(2, 1fr); gap: 9px; }
+
+.sr-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 13px;
+  margin-bottom: 10px;
 }
-@media (max-width: 900px) {
-  .sr-body { margin-left: 0; }
-  .sr-main { padding: 20px 16px 32px; }
-  .sr-heading { font-size: 22px; }
-  .sr-drawer { top: auto; right: 0; left: 0; bottom: 0; width: 100%; max-width: 100%; max-height: 92vh; border-radius: var(--sr-radius) var(--sr-radius) 0 0; }
+
+.sr-stat {
+  min-height: 122px;
+  padding: 14px 17px;
+  border: 1px solid var(--sr-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px #1b37610a;
+}
+
+@media (max-width: 1100px) {
+  .sr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 560px) {
-  .sr-stats { grid-template-columns: 1fr; }
-  .sr-search { flex-basis: 100%; }
-  .sr-select { flex: 1; min-width: 0; }
-  .sr-btn { min-width: 100px; height: 42px; font-size: 16px; }
-  .sr-idblock h3 { font-size: 26px; }
+  .sr-stat { min-height: 114px; padding: 13px; }
+  .sr-stat__icon { width: 34px; height: 34px; margin-bottom: 12px; }
+  .sr-stat__label { font-size: 13px; }
+  .sr-stat__value { font-size: 28px; }
+  /* keep the rest of your 560px rules (search, select, btn, idblock) */
 }

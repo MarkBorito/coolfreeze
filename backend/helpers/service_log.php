@@ -1,7 +1,8 @@
 <?php
 /**
- * Service Request business logic. Uses ONLY the repository functions in
- * service_requests_data.php, so it keeps working after a MySQL swap.
+ * Service Request business logic (checks and messages).
+ * Reads data through service_request_data.php and saves confirm / reject
+ * through the transaction functions in models/request.php.
  */
 require_once __DIR__ . '/service_request_data.php';
 
@@ -42,7 +43,11 @@ function sr_evaluation_label(string $status): string
 function sr_date_short(string $iso): string { return date('M j', strtotime($iso)); }
 function sr_date_long(string $iso): string  { return date('F j, Y', strtotime($iso)); }
 function sr_time(string $hm): string        { return date('g:ia', strtotime('2000-01-01 ' . $hm)); }
+<<<<<<< HEAD
+function sr_peso(float $amount): string     { return '₱' . number_format($amount); }
+=======
 function sr_peso(float|int $amount): string { return '₱' . number_format($amount); }
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 
 function sr_is_valid_request_id(string $id): bool
 {
@@ -115,15 +120,40 @@ function sr_paginate(array $items, int $page, int $perPage = SR_PER_PAGE): array
  */
 function sr_validate_technician_ids(array $rawIds): array
 {
+<<<<<<< HEAD
+    $ids = [];
+    foreach ($rawIds as $raw) {
+        if (!is_string($raw) || !ctype_digit($raw)) {
+            return [[], 'Invalid technician selection.'];
+=======
     try {
         return [admin_validate_technicians(sr_db(), $rawIds), null];
     } catch (RuntimeException $e) {
         if ($e instanceof mysqli_sql_exception) {
             error_log($e->getMessage());
             return [[], 'Something went wrong. Please try again.'];
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
         }
         return [[], $e->getMessage()];
     }
+<<<<<<< HEAD
+    $ids = array_values($ids);
+
+    if (!$ids) {
+        return [[], 'Please select at least one technician.'];
+    }
+    foreach ($ids as $id) {
+        $tech = technician_find_by_id($id);
+        if ($tech === null) {
+            return [[], 'One of the selected technicians does not exist.'];
+        }
+        if ($tech['availability'] !== 'available') {   // on_job or off_duty
+            return [[], $tech['name'] . ' is not available.'];
+        }
+    }
+    return [$ids, null];
+=======
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 }
 
 /** Returns [bool ok, string message]. Runs the same model function as the JSON API. */
@@ -141,6 +171,19 @@ function sr_reject_request(int $adminId, string $id, ?string $reason = null): ar
         error_log($e->getMessage());
         return [false, 'Something went wrong. Please try again.'];
     }
+<<<<<<< HEAD
+    if (!sr_request_is_pending($request)) {
+        return [false, "Request $id has already been processed and cannot be rejected."];
+    }
+
+    global $conn;
+    $adminId = (int) ($_SESSION['admin_id'] ?? 0);
+    if (!request_reject_by_admin($conn, sr_id_to_int($id), $adminId)) {
+        // Someone else processed it between the check above and the save
+        return [false, "Request $id has already been processed and cannot be rejected."];
+    }
+=======
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
     return [true, "Request $id was rejected and marked as Cancelled."];
 }
 
@@ -168,5 +211,25 @@ function sr_error_message(RuntimeException $e): string
         error_log($e->getMessage());
         return 'Something went wrong. Please try again.';
     }
+<<<<<<< HEAD
+    [$ids, $error] = sr_validate_technician_ids($rawTechnicianIds);
+    if ($error !== null) {
+        return [false, $error];
+    }
+
+    global $conn;
+    $adminId = (int) ($_SESSION['admin_id'] ?? 0);
+    try {
+        $saved = request_confirm_by_admin($conn, sr_id_to_int($id), $adminId, $ids);
+    } catch (TechnicianClashException $e) {
+        return [false, $e->getMessage()];   // already rolled back, nothing was saved
+    }
+    if (!$saved) {
+        return [false, "Request $id has already been processed and cannot be confirmed again."];
+    }
+    return [true, "Request $id confirmed with " . count($ids) . ' technician(s).'];
+}
+=======
     return $e->getMessage();
 }
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
