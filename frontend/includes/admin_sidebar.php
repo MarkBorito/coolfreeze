@@ -47,37 +47,41 @@ $sidebarMenu = [
 ?>
 
 <style>
-  /* Responsive CoolFreeze logo for every admin page using this sidebar. */
+  /* Keep the sidebar logo identical on Home, Technicians, Clients and Services. */
   #sidebar .brand {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 0 0 auto;
     width: 100%;
-    min-width: 0;
+    min-height: 92px;
+    padding: 12px 18px;
+    margin: 0;
     box-sizing: border-box;
-    padding: 12px 10px;
     overflow: hidden;
   }
 
   #sidebar .imglogo {
     display: block;
     width: 100%;
-    max-width: 240px;
-    height: auto;
-    max-height: 76px;
-    object-fit: contain;
-    box-sizing: border-box;
+    max-width: 204px;
+    height: 54px;
+    max-height: 54px;
     padding: 0;
+    margin: 0 auto;
+    object-fit: contain;
+    object-position: center;
+    box-sizing: border-box;
   }
 
   @media (max-width: 900px) {
-    #sidebar .brand { padding: 10px 12px; }
-    #sidebar .imglogo { max-width: 220px; max-height: 68px; }
+    #sidebar .brand { min-height: 84px; padding: 10px 16px; }
+    #sidebar .imglogo { max-width: 190px; height: 50px; max-height: 50px; }
   }
 
   @media (max-width: 480px) {
-    #sidebar .brand { padding: 9px 10px; }
-    #sidebar .imglogo { max-width: 190px; max-height: 58px; }
+    #sidebar .brand { min-height: 76px; padding: 9px 14px; }
+    #sidebar .imglogo { max-width: 174px; height: 46px; max-height: 46px; }
   }
 </style>
 
