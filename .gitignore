@@ -1,2 +1,11 @@
 /logs/
 *.log
+
+/vendor
+
+/backend/config/secrets.php
+
+.env
+.env.*
+
+/backend/logs/*.log
