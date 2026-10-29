@@ -2906,6 +2906,10 @@ select {
   color: var(--green);
 }
 
+.detail-confirm i.fa-circle-xmark {
+  color: #dc2626;
+}
+
 .detail-confirm p {
   margin: 0;
 

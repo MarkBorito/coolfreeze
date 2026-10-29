@@ -150,6 +150,8 @@
 }
 .dash-table tbody tr + tr td { border-top: 1px solid var(--border); }
 .dash-table .dash-strong { color: var(--text); font-weight: 500; }
+/* Status column is centered, same as the Service Request table (.sr-center) */
+.dash-table .dash-center { text-align: center !important; }
 .dash-table .dash-empty td { padding: 22px 11px; text-align: center; }
 .dash-table tr[hidden] { display: none; }
 
@@ -174,6 +176,8 @@
 .dash-pill--confirmed { background: var(--green-bg);  color: var(--green); }
 .dash-pill--ongoing   { background: var(--orange-bg); color: var(--orange); }
 .dash-pill--cancelled { background: var(--danger-bg); color: var(--danger); }
+.dash-pill--completed { background: #ece1ff; color: #7c3aed; }
+.dash-table td small { color: var(--primary); font-weight: 600; }
 
 /* Technician status + schedule tables */
 .dash-table--tech, .dash-table--schedule { min-width: 0; }
@@ -189,6 +193,34 @@
 
 /* Today's schedule icons */
 .dash-table--schedule tbody td i { margin-right: 7px; font-size: 12px; }
+
+/* Live indicator next to a panel title */
+.dash-panel__title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dash-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--green-bg);
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dash-live__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dash-live-pulse 1.6s ease-in-out infinite;
+}
+.dash-live[data-state="offline"] { background: var(--danger-bg); color: var(--danger); }
+.dash-live[data-state="offline"] .dash-live__dot { animation: none; }
+@keyframes dash-live-pulse { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .dash-live__dot { animation: none; } }
 
 /* ---------- Bottom row ---------- */
 .admin-dash__bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }

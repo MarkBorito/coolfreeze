@@ -137,3 +137,8 @@
 @media (max-width: 380px) {
 .analytics .metrics{ grid-template-columns: 1fr; }
 }
+
+.analytics.is-loading .metrics,
+.analytics.is-loading .row { opacity: .55; transition: opacity .15s; }
+.report-msg { margin: 0 0 10px; padding: 8px 12px; border-radius: 8px; font-size: 12px; background: #fbdedd; color: #c62828; }
+.activity .empty { color: #637897; font-size: 12px; padding: 8px 0; }

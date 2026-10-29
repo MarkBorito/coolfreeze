@@ -42,7 +42,7 @@ function sr_evaluation_label(string $status): string
 function sr_date_short(string $iso): string { return date('M j', strtotime($iso)); }
 function sr_date_long(string $iso): string  { return date('F j, Y', strtotime($iso)); }
 function sr_time(string $hm): string        { return date('g:ia', strtotime('2000-01-01 ' . $hm)); }
-function sr_peso(int $amount): string       { return '₱' . number_format($amount); }
+function sr_peso(float|int $amount): string { return '₱' . number_format($amount); }
 
 function sr_is_valid_request_id(string $id): bool
 {
@@ -110,71 +110,63 @@ function sr_paginate(array $items, int $page, int $perPage = SR_PER_PAGE): array
 }
 
 /**
- * Validate technician IDs against the technician array.
+ * Validate technician IDs against the technicians table.
  * Returns [cleanIds, errorMessage|null].
  */
 function sr_validate_technician_ids(array $rawIds): array
 {
-    $ids = [];
-    foreach ($rawIds as $raw) {
-        if (!is_string($raw)) {
-            return [[], 'Invalid technician selection.'];
+    try {
+        return [admin_validate_technicians(sr_db(), $rawIds), null];
+    } catch (RuntimeException $e) {
+        if ($e instanceof mysqli_sql_exception) {
+            error_log($e->getMessage());
+            return [[], 'Something went wrong. Please try again.'];
         }
-        $ids[$raw] = $raw; // keys remove duplicates
+        return [[], $e->getMessage()];
     }
-    $ids = array_values($ids);
-
-    if (!$ids) {
-        return [[], 'Please select at least one technician.'];
-    }
-    foreach ($ids as $id) {
-        $tech = technician_find_by_id($id);
-        if ($tech === null) {
-            return [[], 'One of the selected technicians does not exist.'];
-        }
-        if ($tech['availability'] !== 'available') {
-            return [[], $tech['name'] . ' is not available.'];
-        }
-    }
-    return [$ids, null];
 }
 
-/** Returns [bool ok, string message]. */
-function sr_reject_request(string $id): array
+/** Returns [bool ok, string message]. Runs the same model function as the JSON API. */
+function sr_reject_request(int $adminId, string $id, ?string $reason = null): array
 {
-    if (!sr_is_valid_request_id($id)) {
+    $requestId = admin_request_parse_id($id);
+    if (!sr_is_valid_request_id($id) || $requestId < 1) {
         return [false, 'Invalid request ID.'];
     }
-    $request = request_find_by_id($id);
-    if ($request === null) {
-        return [false, 'Request not found.'];
+    try {
+        admin_request_reject(sr_db(), $requestId, $adminId, $reason);
+    } catch (RuntimeException $e) {
+        return [false, sr_error_message($e)];
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        return [false, 'Something went wrong. Please try again.'];
     }
-    if (!sr_request_is_pending($request)) {
-        return [false, "Request $id has already been processed and cannot be rejected."];
-    }
-    request_assign_technicians($id, []); // rejected requests never keep technicians
-    request_update_status($id, 'cancelled');
     return [true, "Request $id was rejected and marked as Cancelled."];
 }
 
 /** Returns [bool ok, string message]. Confirmed != Completed. */
-function sr_confirm_request(string $id, array $rawTechnicianIds): array
+function sr_confirm_request(int $adminId, string $id, array $rawTechnicianIds): array
 {
-    if (!sr_is_valid_request_id($id)) {
+    $requestId = admin_request_parse_id($id);
+    if (!sr_is_valid_request_id($id) || $requestId < 1) {
         return [false, 'Invalid request ID.'];
     }
-    $request = request_find_by_id($id);
-    if ($request === null) {
-        return [false, 'Request not found.'];
+    try {
+        admin_request_accept(sr_db(), $requestId, $adminId, $rawTechnicianIds);
+    } catch (RuntimeException $e) {
+        return [false, sr_error_message($e)];
+    } catch (Throwable $e) {
+        error_log($e->getMessage());
+        return [false, 'Something went wrong. Please try again.'];
     }
-    if (!sr_request_is_pending($request)) {
-        return [false, "Request $id has already been processed and cannot be confirmed again."];
+    return [true, "Request $id confirmed with " . count(array_unique($rawTechnicianIds)) . ' technician(s).'];
+}
+
+function sr_error_message(RuntimeException $e): string
+{
+    if ($e instanceof mysqli_sql_exception) {
+        error_log($e->getMessage());
+        return 'Something went wrong. Please try again.';
     }
-    [$ids, $error] = sr_validate_technician_ids($rawTechnicianIds);
-    if ($error !== null) {
-        return [false, $error];
-    }
-    request_assign_technicians($id, $ids);
-    request_update_status($id, 'confirmed');
-    return [true, "Request $id confirmed with " . count($ids) . ' technician(s).'];
+    return $e->getMessage();
 }
