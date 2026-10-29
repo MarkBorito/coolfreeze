@@ -5,6 +5,7 @@ require_once BACKEND_PATH . '/helpers/guard.php';
 require_once BACKEND_PATH . '/models/customer.php';
 require_once BACKEND_PATH . '/models/service.php';
 $unitTypes = unit_type_all_active($conn);
+$services  = service_all_active($conn);   // active services saved on the admin Services page
 $customer  = customer_find($conn, (int) $_SESSION['customer_id']);
 
 $userName = $_SESSION['username'] ?? 'Customer';
@@ -64,277 +65,58 @@ function e($value) {
         </div>
 
         <section class="services-grid">
-          <!-- AC CLEANING -->
-          <article class="card" data-service-id="1">
-            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
-              class="card-img">
-            <div class="card-body">
-              <h2>
-                AC Cleaning
-              </h2>
-              <p class="desc">
-                Keep your aircon clean and efficient with
-                our professional cleaning service
-              </p>
-              <p class="includes">
-                Services include:
-              </p>
-              <ul class="checklist">
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  General cleaning
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Filter cleaning
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Unit inspection
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Basic performance check
-                </li>
-              </ul>
-              <div class="card-footer">
-                <div class="price">
-                  <i class="fa-solid fa-tag"></i>
-                  <div>
-                    <small>
-                      Starting from
-                    </small>
-                    <strong>
-                      ₱ 800
-                    </strong>
+          <?php if (!$services): ?>
+            <p class="page-subtitle">No services are available right now. Please check back soon.</p>
+          <?php endif; ?>
+
+          <?php foreach ($services as $service): ?>
+            <?php
+              $image = $service['image'] !== null && $service['image'] !== ''
+                ? BASE_URL . $service['image']
+                : BASE_URL . 'frontend/assets/img/couch.svg';
+            ?>
+            <!-- <?= e($service['name']) ?> (from the database: edit it on the admin Services page) -->
+            <article class="card" data-service-id="<?= (int) $service['service_id'] ?>">
+              <img src="<?= e($image) ?>" alt="<?= e($service['name']) ?>"
+                class="card-img">
+              <div class="card-body">
+                <h2>
+                  <?= e($service['name']) ?>
+                </h2>
+                <p class="desc">
+                  <?= e($service['description']) ?>
+                </p>
+                <p class="includes">
+                  Services include:
+                </p>
+                <ul class="checklist">
+                  <?php foreach ($service['inclusions'] as $label): ?>
+                    <li>
+                      <i class="fa-solid fa-circle-check"></i>
+                      <?= e($label) ?>
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+                <div class="card-footer">
+                  <div class="price">
+                    <i class="fa-solid fa-tag"></i>
+                    <div>
+                      <small>
+                        Starting from
+                      </small>
+                      <strong>
+                        ₱ <?= number_format((float) $service['base_price']) ?>
+                      </strong>
+                    </div>
                   </div>
+                  <button type="button" class="btn-request">
+                    Request Service
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
                 </div>
-                <button type="button" class="btn-request">
-                  Request Service
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
               </div>
-            </div>
-          </article>
-
-          <!-- AC REPAIR -->
-          <article class="card" data-service-id="2">
-            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
-              class="card-img">
-            <div class="card-body">
-              <h2>
-                AC Repair
-              </h2>
-              <p class="desc">
-                We fix aircon problems quickly and efficiently
-                to get your unit back in condition
-              </p>
-              <p class="includes">
-                Services include:
-              </p>
-              <ul class="checklist">
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Diagnose the issue
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Repair faulty parts
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Test functionality
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Provide service report
-                </li>
-              </ul>
-
-              <div class="card-footer">
-                <div class="price">
-                  <i class="fa-solid fa-tag"></i>
-                  <div>
-                    <small>
-                      Starting from
-                    </small>
-                    <strong>
-                      ₱ 1000
-                    </strong>
-                  </div>
-                </div>
-
-                <button type="button" class="btn-request">
-                  Request Service
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <!-- AC MAINTENANCE -->
-          <article class="card" data-service-id="3">
-            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
-              class="card-img">
-            <div class="card-body">
-              <h2>
-                AC Maintenance
-              </h2>
-              <p class="desc">
-                Prevent problems before they happen with
-                our scheduled maintenance service
-              </p>
-              <p class="includes">
-                Services include:
-              </p>
-              <ul class="checklist">
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Full system check
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Clean and inspect components
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Optimize performance
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Extend unit lifespan
-                </li>
-              </ul>
-
-              <div class="card-footer">
-                <div class="price">
-                  <i class="fa-solid fa-tag"></i>
-                  <div>
-                    <small>
-                      Starting from
-                    </small>
-                    <strong>
-                      ₱ 1200
-                    </strong>
-                  </div>
-                </div>
-
-                <button type="button" class="btn-request">
-                  Request Service
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <!-- AC INSTALLATION -->
-          <article class="card" data-service-id="4">
-            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
-              class="card-img">
-            <div class="card-body">
-              <h2>
-                AC Installation
-              </h2>
-              <p class="desc">
-                Professional installation for your new
-                aircon unit
-              </p>
-              <p class="includes">
-                Services include:
-              </p>
-              <ul class="checklist">
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Site inspection
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Proper unit installation
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  System testing
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Warranty and support
-                </li>
-              </ul>
-
-              <div class="card-footer">
-                <div class="price">
-                  <i class="fa-solid fa-tag"></i>
-                  <div>
-                    <small>
-                      Starting from
-                    </small>
-                    <strong>
-                      ₱ 800
-                    </strong>
-                  </div>
-                </div>
-
-                <button type="button" class="btn-request">
-                  Request Service
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </article>
-
-          <!-- PARTS REPLACEMENT -->
-          <article class="card" data-service-id="5">
-            <img src="<?= BASE_URL ?>frontend/assets/img/couch.svg" alt="Bright living room with a grey sofa"
-              class="card-img">
-            <div class="card-body">
-              <h2>
-                Parts Replacement
-              </h2>
-              <p class="desc">
-                Replace damaged parts with genuine and
-                high-quality components
-              </p>
-              <p class="includes">
-                Services include:
-              </p>
-              <ul class="checklist">
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Genuine parts
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Professional installation
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  System testing
-                </li>
-                <li>
-                  <i class="fa-solid fa-circle-check"></i>
-                  Warranty and replaced parts
-                </li>
-              </ul>
-
-              <div class="card-footer">
-                <div class="price">
-                  <i class="fa-solid fa-tag"></i>
-                  <div>
-                    <small>
-                      Starting from
-                    </small>
-                    <strong>
-                      ₱ 800
-                    </strong>
-                  </div>
-                </div>
-                <button type="button" class="btn-request">
-                  Request Service
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </article>
+            </article>
+          <?php endforeach; ?>
         </section>
       </main>
     </div>

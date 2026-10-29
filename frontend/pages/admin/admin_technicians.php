@@ -1,111 +1,21 @@
-<?php 
+<?php
 require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
 require_once BACKEND_PATH . '/helpers/admin_guard.php';
+require_once BACKEND_PATH . '/models/admin_technician.php';
 
-$userName = $_SESSION['username'] ?? 'Admin';
+$userName    = $_SESSION['username'] ?? 'Admin';
 $currentPage = 'admin_technicians';
 
-$technicians = [
-    [
-        'id'        => 'T-000125',
-        'name'      => 'Bernardo, Mikha Champagne',
-        'specialty' => 'AC Cleaning',
-        'status'    => 'Pending',
-        'service'   => 'SR-00125',
-        'phone'     => '0999-092-9999',
-        'email'     => 'bernardo.mikha@gmail.com',
-        'address'   => '123 Anya Kanan St., Brgy. San Miguel, Dasmariñas',
-        'schedule'  => 'M-W-F',
-        'hours'     => '10:00 AM – 8:00 PM',
-    ],
-    [
-        'id'        => 'T-000124',
-        'name'      => 'Borito, Mark Adrian A.',
-        'specialty' => 'AC Repair',
-        'status'    => 'Confirmed',
-        'service'   => 'SR-00125',
-        'phone'     => '0912-345-6789',
-        'email'     => 'mark.borito@gmail.com',
-        'address'   => 'Dasmariñas, Cavite',
-        'schedule'  => 'T-Th-Sat',
-        'hours'     => '9:00 AM – 6:00 PM',
-    ],
-    [
-        'id'        => 'T-000123',
-        'name'      => 'Eugenio, Mark Lawrence',
-        'specialty' => 'AC Install',
-        'status'    => 'On going',
-        'service'   => 'SR-00123',
-        'phone'     => '0917-111-2233',
-        'email'     => 'mark.eugenio@gmail.com',
-        'address'   => 'Imus, Cavite',
-        'schedule'  => 'M-W-F',
-        'hours'     => '8:00 AM – 5:00 PM',
-    ],
-    [
-        'id'        => 'T-000122',
-        'name'      => 'Legaspi, Mark Lailor O.',
-        'specialty' => 'Maintenance',
-        'status'    => 'Cancelled',
-        'service'   => '—',
-        'phone'     => '0918-222-3344',
-        'email'     => 'mark.legaspi@gmail.com',
-        'address'   => 'Bacoor, Cavite',
-        'schedule'  => 'T-Th-Sat',
-        'hours'     => '10:00 AM – 7:00 PM',
-    ],
-    [
-        'id'        => 'T-000121',
-        'name'      => 'Quizon, Richmond A.',
-        'specialty' => 'Parts Replacement',
-        'status'    => 'Completed',
-        'service'   => '—',
-        'phone'     => '0920-333-4455',
-        'email'     => 'richmond.quizon@gmail.com',
-        'address'   => 'General Trias, Cavite',
-        'schedule'  => 'M-W-F',
-        'hours'     => '9:00 AM – 6:00 PM',
-    ],
-    [
-        'id'        => 'T-000121',
-        'name'      => 'Repol, Christian Paul R.',
-        'specialty' => 'Parts Replacement',
-        'status'    => 'Completed',
-        'service'   => '—',
-        'phone'     => '0921-444-5566',
-        'email'     => 'christian.repol@gmail.com',
-        'address'   => 'Cavite, Philippines',
-        'schedule'  => 'T-Th-Sat',
-        'hours'     => '10:00 AM – 8:00 PM',
-    ],
-    [
-        'id'        => 'T-000121',
-        'name'      => 'Sarah Duterte',
-        'specialty' => 'Parts Replacement',
-        'status'    => 'Completed',
-        'service'   => '—',
-        'phone'     => '0922-555-6677',
-        'email'     => 'sarah.duterte@example.com',
-        'address'   => 'Cavite, Philippines',
-        'schedule'  => 'M-W-F',
-        'hours'     => '10:00 AM – 8:00 PM',
-    ],
-];
+// Real technicians from MySQL. The Service Request page assigns from this same table.
+$technicians = admin_technician_overview($conn);
+$stats       = admin_technician_stats($technicians);
+$specialties = admin_technician_specialties($conn);
 
-// Pick the technician shown in the detail panel (defaults to the first one).
-$selectedId = $_GET['technician_id'] ?? $technicians[0]['id'];
-$selected   = $technicians[0];
-
-foreach ($technicians as $technician) {
-    if ($technician['id'] === $selectedId) {
-        $selected = $technician;
-        break;
+if (!function_exists('h')) {
+    function h($value)
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
-}
-
-function h($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 ?>
 <!doctype html>
@@ -135,12 +45,14 @@ function h($value)
 
         <section class="page-content">
 
+            <div class="flash" id="flash" role="status" hidden></div>
+
             <!-- Page heading -->
             <div class="page-heading">
                 <div>
                     <p class="eyebrow">Service Management › Technicians</p>
                     <h1>Check your <span>Technicians</span></h1>
-                    <p class="subtitle">Manage your clients</p>
+                    <p class="subtitle">Manage your technicians</p>
                 </div>
             </div>
 
@@ -149,25 +61,25 @@ function h($value)
                 <article class="stat-card">
                     <div class="stat-icon blue"><i class="fa-regular fa-clock"></i></div>
                     <p>All Technicians</p>
-                    <strong>6</strong>
+                    <strong><?= (int) $stats['total'] ?></strong>
                 </article>
 
                 <article class="stat-card">
                     <div class="stat-icon blue"><i class="fa-regular fa-clock"></i></div>
                     <p>Available</p>
-                    <strong>2</strong>
+                    <strong><?= (int) $stats['available'] ?></strong>
                 </article>
 
                 <article class="stat-card">
                     <div class="stat-icon green"><i class="fa-solid fa-check"></i></div>
                     <p>Assigned</p>
-                    <strong class="green-text">3</strong>
+                    <strong class="green-text"><?= (int) $stats['assigned'] ?></strong>
                 </article>
 
                 <article class="stat-card">
                     <div class="stat-icon red"><i class="fa-regular fa-calendar-xmark"></i></div>
                     <p>Off Duty</p>
-                    <strong class="red-text">1</strong>
+                    <strong class="red-text"><?= (int) $stats['off_duty'] ?></strong>
                 </article>
             </div>
 
@@ -186,11 +98,10 @@ function h($value)
 
                     <select id="statusFilter" aria-label="Filter by status">
                         <option value="all">All Status</option>
-                        <option>Pending</option>
+                        <option>Available</option>
                         <option>Confirmed</option>
                         <option>On going</option>
-                        <option>Cancelled</option>
-                        <option>Completed</option>
+                        <option>Off Duty</option>
                     </select>
                 </div>
             </div>
@@ -203,7 +114,7 @@ function h($value)
                         <h2>Technicians</h2>
 
                         <div class="table-title-actions">
-                            <span id="resultCount">7 technicians</span>
+                            <span id="resultCount"><?= count($technicians) ?> technicians</span>
                             <button class="primary-button" id="addTechnician" type="button">
                                 <i class="fa-solid fa-plus"></i> New Technician
                             </button>
@@ -223,6 +134,9 @@ function h($value)
                             </thead>
 
                             <tbody id="technicianRows">
+                                <?php if (!$technicians): ?>
+                                    <tr><td colspan="5" class="empty-row">No technicians yet. Click “New Technician” to add one.</td></tr>
+                                <?php endif; ?>
                                 <?php foreach ($technicians as $technician): ?>
                                     <?php
                                     $statusClass = strtolower(str_replace(' ', '-', $technician['status']));
@@ -271,23 +185,23 @@ function h($value)
 
                         <div class="detail-person">
                             <div class="avatar"><i class="fa-regular fa-user"></i></div>
-                            <h3 id="detailName"><?= h($selected['name']) ?></h3>
-                            <span class="detail-status" id="detailStatus"><?= h($selected['status']) ?></span>
+                            <h3 id="detailName"></h3>
+                            <span class="detail-status" id="detailStatus"></span>
                         </div>
 
                         <div class="detail-section">
                             <h4>Personal Information</h4>
                             <p>
                                 <i class="fa-regular fa-user"></i>
-                                <span id="detailFullName"><?= h($selected['name']) ?></span>
+                                <span id="detailFullName"></span>
                             </p>
                             <p>
                                 <i class="fa-solid fa-phone"></i>
-                                <span id="detailPhone"><?= h($selected['phone']) ?></span>
+                                <span id="detailPhone"></span>
                             </p>
                             <p>
                                 <i class="fa-regular fa-envelope"></i>
-                                <span id="detailEmail"><?= h($selected['email']) ?></span>
+                                <span id="detailEmail"></span>
                             </p>
                         </div>
 
@@ -295,11 +209,7 @@ function h($value)
                             <h4>Specialization</h4>
                             <p>
                                 <i class="fa-solid fa-fan"></i>
-                                <span id="detailSpecialty"><?= h($selected['specialty']) ?></span>
-                            </p>
-                            <p>
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                                <span>AC Repair</span>
+                                <span id="detailSpecialty"></span>
                             </p>
                         </div>
 
@@ -307,7 +217,7 @@ function h($value)
                             <h4>Address</h4>
                             <p>
                                 <i class="fa-solid fa-location-dot"></i>
-                                <span id="detailAddress"><?= h($selected['address']) ?></span>
+                                <span id="detailAddress"></span>
                             </p>
                         </div>
 
@@ -315,17 +225,18 @@ function h($value)
                             <h4>Working day-hour</h4>
                             <p>
                                 <i class="fa-regular fa-calendar"></i>
-                                <span id="detailSchedule"><?= h($selected['schedule']) ?></span>
+                                <span id="detailSchedule"></span>
                             </p>
                             <p>
                                 <i class="fa-regular fa-clock"></i>
-                                <span id="detailHours"><?= h($selected['hours']) ?></span>
+                                <span id="detailHours"></span>
                             </p>
                         </div>
 
                     </div>
 
-                    <div class="detail-footer">
+                    <div class="detail-footer split">
+                        <button class="btn btn-danger" id="availabilityButton" type="button">Set Off Duty</button>
                         <button class="done-button" id="doneButton" type="button">Done</button>
                     </div>
 
@@ -336,7 +247,100 @@ function h($value)
     </main>
 </div>
 
+<!-- New Technician form -->
+<div class="modal-backdrop" id="techModal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="techModalTitle">
+        <div class="modal-head">
+            <h2 id="techModalTitle">New Technician</h2>
+            <button type="button" class="modal-close" id="techModalClose" aria-label="Close">×</button>
+        </div>
+
+        <form id="techForm" novalidate>
+            <input type="hidden" name="action" value="create">
+
+            <div class="form-grid">
+                <label class="field field-wide">
+                    <span>Full name *</span>
+                    <input type="text" name="full_name" maxlength="100" placeholder="Last name, First name" required>
+                    <small class="field-error" data-error-for="full_name"></small>
+                </label>
+
+                <label class="field">
+                    <span>Username *</span>
+                    <input type="text" name="username" maxlength="50" autocomplete="off" required>
+                    <small class="field-error" data-error-for="username"></small>
+                </label>
+
+                <label class="field">
+                    <span>Temporary password *</span>
+                    <input type="password" name="password" minlength="8" autocomplete="new-password" required>
+                    <small class="field-error" data-error-for="password"></small>
+                </label>
+
+                <label class="field">
+                    <span>Email *</span>
+                    <input type="email" name="email" maxlength="100" autocomplete="off" required>
+                    <small class="field-error" data-error-for="email"></small>
+                </label>
+
+                <label class="field">
+                    <span>Phone *</span>
+                    <input type="tel" name="phone" maxlength="20" placeholder="0917-123-4567" required>
+                    <small class="field-error" data-error-for="phone"></small>
+                </label>
+
+                <label class="field field-wide">
+                    <span>Specialization</span>
+                    <select name="specialty">
+                        <option value="">Select a service</option>
+                        <?php foreach ($specialties as $name): ?>
+                            <option value="<?= h($name) ?>"><?= h($name) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="field-error" data-error-for="specialty"></small>
+                </label>
+
+                <label class="field field-wide">
+                    <span>Address</span>
+                    <input type="text" name="address" maxlength="255" placeholder="Street, Barangay, City">
+                    <small class="field-error" data-error-for="address"></small>
+                </label>
+
+                <fieldset class="field field-wide days">
+                    <legend>Working days</legend>
+                    <div class="day-list">
+                        <?php foreach (TECHNICIAN_DAYS as $day): ?>
+                            <label class="day"><input type="checkbox" name="work_days[]" value="<?= h($day) ?>"><span><?= h($day) ?></span></label>
+                        <?php endforeach; ?>
+                    </div>
+                </fieldset>
+
+                <label class="field">
+                    <span>Start time</span>
+                    <input type="time" name="work_start">
+                </label>
+
+                <label class="field">
+                    <span>End time</span>
+                    <input type="time" name="work_end">
+                    <small class="field-error" data-error-for="work_hours"></small>
+                </label>
+            </div>
+
+            <p class="form-error" id="techFormError" hidden></p>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="techModalCancel">Cancel</button>
+                <button type="submit" class="btn btn-success" id="techSubmit">Add Technician</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
 <script>
+const API_URL = '<?= BASE_URL ?>backend/api/Admin/technicians.php';
+
 // ---------------------------------------------------------------
 // Element references
 // ---------------------------------------------------------------
@@ -347,12 +351,30 @@ const rowsContainer = document.getElementById('technicianRows');
 const resultCount   = document.getElementById('resultCount');
 const detailCard    = document.getElementById('detailCard');
 const contentGrid   = document.getElementById('contentGrid');
+const flashBox      = document.getElementById('flash');
+
+let currentTechnician = null;
+
+// Message that survives the page reload after add / update
+function showFlash(text, type = 'success') {
+    flashBox.textContent = text;
+    flashBox.className   = 'flash flash--' + type;
+    flashBox.hidden      = false;
+}
+function reloadWithFlash(text) {
+    try { sessionStorage.setItem('techFlash', text); } catch (e) {}
+    location.reload();
+}
+try {
+    const saved = sessionStorage.getItem('techFlash');
+    if (saved) { showFlash(saved); sessionStorage.removeItem('techFlash'); }
+} catch (e) {}
 
 // ---------------------------------------------------------------
 // Search, filter and sort
 // ---------------------------------------------------------------
 function refreshRows(keepPage) {
-    const rows    = [...rowsContainer.querySelectorAll('tr')];
+    const rows    = [...rowsContainer.querySelectorAll('tr.technician-row')];
     const query   = searchInput.value.trim().toLowerCase();
     const sortKey = sortSelect.value === 'specialty' ? 'specialty' : 'name';
 
@@ -368,7 +390,7 @@ function refreshRows(keepPage) {
     });
 
     const visibleCount = rows.filter(row => row.dataset.match === '1').length;
-    resultCount.textContent = visibleCount + ' technicians';
+    resultCount.textContent = visibleCount + (visibleCount === 1 ? ' technician' : ' technicians');
 
     paginate(keepPage === true);
 }
@@ -441,7 +463,7 @@ function renderPagination(totalPages) {
 
 // Shows only the rows of the current page (among rows that match search/filter)
 function paginate(keepPage = false) {
-    const allRows = [...rowsContainer.querySelectorAll('tr')];
+    const allRows = [...rowsContainer.querySelectorAll('tr.technician-row')];
     const matched = allRows.filter(row => row.dataset.match !== '0');
     const totalPages = Math.max(1, Math.ceil(matched.length / ROWS_PER_PAGE));
 
@@ -462,7 +484,11 @@ sortSelect.addEventListener('change', refreshRows);
 // ---------------------------------------------------------------
 // Detail panel
 // ---------------------------------------------------------------
+const availabilityButton = document.getElementById('availabilityButton');
+
 function setDetail(technician, row = null) {
+    currentTechnician = technician;
+
     document.getElementById('detailName').textContent      = technician.name;
     document.getElementById('detailFullName').textContent  = technician.name;
     document.getElementById('detailStatus').textContent    = technician.status;
@@ -472,6 +498,10 @@ function setDetail(technician, row = null) {
     document.getElementById('detailAddress').textContent   = technician.address;
     document.getElementById('detailSchedule').textContent  = technician.schedule;
     document.getElementById('detailHours').textContent     = technician.hours;
+
+    const offDuty = technician.availability === 'off_duty';
+    availabilityButton.textContent = offDuty ? 'Set Available' : 'Set Off Duty';
+    availabilityButton.className   = 'btn ' + (offDuty ? 'btn-success' : 'btn-danger');
 
     detailCard.classList.remove('hidden');
     contentGrid.classList.add('with-detail');
@@ -487,6 +517,7 @@ function setDetail(technician, row = null) {
 function closeTechnicianDetail() {
     detailCard.classList.add('hidden');
     contentGrid.classList.remove('with-detail');
+    currentTechnician = null;
 
     document.querySelectorAll('.technician-row')
         .forEach(row => row.classList.remove('selected-row'));
@@ -507,15 +538,87 @@ document.querySelectorAll('.technician-row').forEach(row => {
 document.getElementById('closeDetail').addEventListener('click', closeTechnicianDetail);
 document.getElementById('doneButton').addEventListener('click', closeTechnicianDetail);
 
+// Available <-> Off Duty (saved in the database)
+availabilityButton.addEventListener('click', () => {
+    if (!currentTechnician) return;
+
+    const next = currentTechnician.availability === 'off_duty' ? 'available' : 'off_duty';
+    if (!confirm((next === 'off_duty' ? 'Set ' : 'Set ') + currentTechnician.name + (next === 'off_duty' ? ' as Off Duty?' : ' as Available?'))) return;
+
+    availabilityButton.disabled = true;
+    cfPost(API_URL, {
+        action: 'set_availability',
+        technician_id: currentTechnician.technician_id,
+        availability: next
+    }).then(res => {
+        availabilityButton.disabled = false;
+        if (!res.success) {
+            alert(cfFirstError(res));
+            return;
+        }
+        reloadWithFlash(currentTechnician.name + ' is now ' + (next === 'off_duty' ? 'Off Duty.' : 'Available.'));
+    });
+});
 
 document.getElementById('menuButton')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('open');
 });
 
-document.getElementById('addTechnician').addEventListener('click', () => {
-    alert('Connect this button to your New Technician form.');
-});
+// ---------------------------------------------------------------
+// New Technician form
+// ---------------------------------------------------------------
+const techModal    = document.getElementById('techModal');
+const techForm     = document.getElementById('techForm');
+const techFormErr  = document.getElementById('techFormError');
+const techSubmit   = document.getElementById('techSubmit');
 
+function clearFormErrors() {
+    techForm.querySelectorAll('.field-error').forEach(node => { node.textContent = ''; });
+    techFormErr.hidden = true;
+}
+
+function openTechModal() {
+    techForm.reset();
+    clearFormErrors();
+    techModal.hidden = false;
+    techForm.querySelector('[name="full_name"]').focus();
+}
+
+function closeTechModal() {
+    techModal.hidden = true;
+}
+
+document.getElementById('addTechnician').addEventListener('click', openTechModal);
+document.getElementById('techModalClose').addEventListener('click', closeTechModal);
+document.getElementById('techModalCancel').addEventListener('click', closeTechModal);
+techModal.addEventListener('click', event => { if (event.target === techModal) closeTechModal(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && !techModal.hidden) closeTechModal(); });
+
+techForm.addEventListener('submit', event => {
+    event.preventDefault();
+    clearFormErrors();
+
+    techSubmit.disabled = true;
+    cfPost(API_URL, new FormData(techForm)).then(res => {
+        techSubmit.disabled = false;
+
+        if (res.success) {
+            closeTechModal();
+            reloadWithFlash(res.message);
+            return;
+        }
+
+        let shown = false;
+        Object.entries(res.errors || {}).forEach(([field, message]) => {
+            const node = techForm.querySelector('[data-error-for="' + field + '"]');
+            if (node) { node.textContent = message; shown = true; }
+        });
+        if (!shown) {
+            techFormErr.textContent = cfFirstError(res);
+            techFormErr.hidden = false;
+        }
+    });
+});
 
 paginate();
 </script>

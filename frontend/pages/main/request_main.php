@@ -47,6 +47,11 @@ foreach (request_list_for_customer($conn, $customerId) as $row) {
         'hasAttachment' => !empty($d['attachments']),
         'contactName'   => $d['contact_name'],
         'contactPhone'  => $d['contact_phone'],
+        // What the admin decided: shown in the slide-in panel
+        'technicianList' => array_map(fn ($t) => ['name' => $t['full_name'], 'phone' => $t['phone'], 'lead' => (int) $t['is_lead'] === 1], $d['technicians']),
+        'scheduledText'  => $d['scheduled_date'] ? date('M j, Y', strtotime($d['scheduled_date'])) . ' · ' . $d['scheduled_time'] : '',
+        'cancelReason'   => $d['cancel_reason'] ?: '',
+        'cancelledBy'    => $d['cancelled_by_type'] ?: '',
     ];
 
     // Completed requests with a proof of service open the Proof modal
@@ -116,6 +121,10 @@ foreach ($requests as $request) {
         'hasAttachment' => $request['hasAttachment'],
         'contactName' => $request['contactName'],
         'contactPhone' => $request['contactPhone'],
+        'technicianList' => $request['technicianList'],
+        'scheduledText' => $request['scheduledText'],
+        'cancelReason' => $request['cancelReason'],
+        'cancelledBy' => $request['cancelledBy'],
     ];
 
     if (isset($request['proof'])) {
@@ -411,12 +420,26 @@ foreach ($requests as $request) {
 
     </div>
 
-    <!-- CONFIRMATION -->
-    <div class="detail-confirm">
-      <i class="fa-solid fa-circle-check"></i>
+    <!-- ASSIGNED TECHNICIAN (shown once the admin accepted the request) -->
+    <div class="detail-section" id="detailTechSection" style="display: none;">
+
+      <p class="detail-label">
+        <i class="fa-solid fa-user-gear"></i>
+        Assigned Technician
+      </p>
+
+      <div id="detailTechnicians">
+        <!-- filled by JS -->
+      </div>
+
+    </div>
+
+    <!-- CONFIRMATION (text follows the admin's decision) -->
+    <div class="detail-confirm" id="detailConfirm">
+      <i class="fa-solid fa-circle-check" id="detailConfirmIcon"></i>
       <div>
-        <p>Your request has been successfully submitted</p>
-        <p>Our team will review your request and assign a technician.</p>
+        <p id="detailConfirmTitle">Your request has been successfully submitted</p>
+        <p id="detailConfirmText">Our team will review your request and assign a technician.</p>
       </div>
     </div>
 
@@ -609,6 +632,46 @@ foreach ($requests as $request) {
       });
     };
 
+    // Shows what the admin decided: accepted + technician(s), rejected + reason, or still waiting
+    var renderDecision = function(data) {
+      var title = document.getElementById('detailConfirmTitle');
+      var text = document.getElementById('detailConfirmText');
+      var icon = document.getElementById('detailConfirmIcon');
+      var techSection = document.getElementById('detailTechSection');
+      var techBox = document.getElementById('detailTechnicians');
+
+      techBox.innerHTML = '';
+      (data.technicianList || []).forEach(function(tech) {
+        var row = document.createElement('p');
+        row.className = 'detail-contact';
+        row.innerHTML = '<i class="fa-solid fa-user"></i><span>' + cfEscape(tech.name) +
+          (tech.lead ? ' (lead)' : '') + (tech.phone ? ' \u00B7 ' + cfEscape(tech.phone) : '') + '</span>';
+        techBox.appendChild(row);
+      });
+      techSection.style.display = (data.technicianList || []).length && data.statusLabel !== 'Cancelled' ? 'block' : 'none';
+
+      icon.className = 'fa-solid fa-circle-check';
+      if (data.statusLabel === 'Confirmed') {
+        title.textContent = 'Your request was accepted';
+        text.textContent = data.scheduledText
+          ? 'Your technician is scheduled for ' + data.scheduledText + '.'
+          : 'A technician has been assigned to your request.';
+      } else if (data.statusLabel === 'On going') {
+        title.textContent = 'Your service is on going';
+        text.textContent = 'Your technician is working on your request.';
+      } else if (data.statusLabel === 'Completed') {
+        title.textContent = 'Service completed';
+        text.textContent = 'Thank you for choosing CoolFreeze.';
+      } else if (data.statusLabel === 'Cancelled') {
+        icon.className = 'fa-solid fa-circle-xmark';
+        title.textContent = data.cancelledBy === 'admin' ? 'Your request was rejected' : 'You cancelled this request';
+        text.textContent = data.cancelReason || (data.cancelledBy === 'admin' ? 'Please contact us if you have questions.' : 'This request is closed.');
+      } else {
+        title.textContent = 'Your request has been successfully submitted';
+        text.textContent = 'Our team will review your request and assign a technician.';
+      }
+    };
+
     var openDetail = function(data) {
       document.getElementById('detailRequestId').textContent = data.requestId;
 
@@ -629,6 +692,8 @@ foreach ($requests as $request) {
       document.getElementById('detailContact').textContent = data.contactName + ' \u00B7 ' + data.contactPhone;
 
       document.getElementById('detailAttachment').style.display = data.hasAttachment ? 'inline-flex' : 'none';
+
+      renderDecision(data);
 
       list.querySelectorAll('.request-item').forEach(function(item) {
         item.classList.remove('is-active');

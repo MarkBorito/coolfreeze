@@ -35,12 +35,19 @@
       <!-- TOP ACTIONS -->
       <div class="top-actions">
 
+<<<<<<< HEAD
        
 
         <a href="<?= e($headerPagesUrl) ?>?page=profile_main" class="profile-link">
           <i class="fa-solid fa-user"></i>
           <span><?= e($userName) ?></span>
         </a>
+=======
+    <a href="<?= e($headerPagesUrl) ?>?page=profile_main" class="profile-link">
+      <i class="fa-solid fa-user"></i>
+      <span><?= e($userName) ?></span>
+    </a>
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 
       </div>
 

@@ -1,96 +1,14 @@
 <?php 
 require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
 require_once BACKEND_PATH . '/helpers/admin_guard.php';
+require_once BACKEND_PATH . '/models/admin_client.php';
 
 $userName = $_SESSION['username'] ?? 'Admin';
 $currentPage = 'admin_client';
 
 
-$clients = [
-    [
-        'id'         => 'CL-1',
-        'name'       => 'JuanTzy',
-        'email'      => 'juantzy@gmail.com',
-        'phone'      => '0999-999-9999',
-        'address'    => '1234 Anya Kanya St., Brgy. San Miguel, Dasmariñas, Cavite',
-        'registered' => 'September 4, 2024',
-        'status'     => 'Active',
-        'services'   => [
-            ['id' => 'SR-00923', 'type' => 'AC Cleaning',     'date' => 'Sep 15, 2024', 'price' => '1,500', 'status' => 'Completed'],
-            ['id' => 'SR-00871', 'type' => 'AC Repair',       'date' => 'Aug 02, 2024', 'price' => '2,200', 'status' => 'Completed'],
-            ['id' => 'SR-00790', 'type' => 'AC Installation', 'date' => 'Jun 18, 2024', 'price' => '6,500', 'status' => 'Completed'],
-        ],
-    ],
-    [
-        'id'         => 'CL-2',
-        'name'       => 'Maria Santos',
-        'email'      => 'maria.santos@gmail.com',
-        'phone'      => '0917-123-4567',
-        'address'    => 'Imus, Cavite',
-        'registered' => 'October 12, 2024',
-        'status'     => 'Active',
-        'services'   => [
-            ['id' => 'SR-00931', 'type' => 'AC Repair', 'date' => 'Sep 21, 2024', 'price' => '2,000', 'status' => 'On going'],
-        ],
-    ],
-    [
-        'id'         => 'CL-3',
-        'name'       => 'Pedro Reyes',
-        'email'      => 'pedro.reyes@gmail.com',
-        'phone'      => '0918-234-5678',
-        'address'    => 'Bacoor, Cavite',
-        'registered' => 'November 3, 2024',
-        'status'     => 'Active',
-        'services'   => [
-            ['id' => 'SR-00902', 'type' => 'AC Cleaning', 'date' => 'Sep 09, 2024', 'price' => '1,200', 'status' => 'Completed'],
-            ['id' => 'SR-00844', 'type' => 'Maintenance', 'date' => 'Jul 30, 2024', 'price' => '1,800', 'status' => 'Cancelled'],
-        ],
-    ],
-    [
-        'id'         => 'CL-4',
-        'name'       => 'Ana Lim',
-        'email'      => 'ana.lim@gmail.com',
-        'phone'      => '0920-345-6789',
-        'address'    => 'General Trias, Cavite',
-        'registered' => 'December 1, 2024',
-        'status'     => 'Inactive',
-        'services'   => [],
-    ],
-    [
-        'id'         => 'CL-5',
-        'name'       => 'Carlo Mendoza',
-        'email'      => 'carlo.mendoza@gmail.com',
-        'phone'      => '0921-456-7890',
-        'address'    => 'Dasmariñas, Cavite',
-        'registered' => 'January 15, 2025',
-        'status'     => 'Active',
-        'services'   => [
-            ['id' => 'SR-00955', 'type' => 'AC Installation', 'date' => 'Sep 28, 2024', 'price' => '7,000', 'status' => 'Pending'],
-        ],
-    ],
-    [
-        'id'         => 'CL-6',
-        'name'       => 'Liza Navarro',
-        'email'      => 'liza.navarro@gmail.com',
-        'phone'      => '0922-567-8901',
-        'address'    => 'Silang, Cavite',
-        'registered' => 'February 20, 2025',
-        'status'     => 'Inactive',
-        'services'   => [
-            ['id' => 'SR-00811', 'type' => 'AC Cleaning', 'date' => 'Jul 05, 2024', 'price' => '1,500', 'status' => 'Completed'],
-        ],
-    ],
-    [
-        'id'         => 'CL-7',
-        'name'       => 'Rico Aquino',
-        'email'      => 'rico.aquino@gmail.com',
-        'phone'      => '0923-678-9012',
-        'address'    => 'Tagaytay, Cavite',
-        'registered' => 'March 8, 2025',
-        'status'     => 'Active',
-        'services'   => [],
-    ],
-];
+// Registered customers from MySQL (same users who signed up on the client side)
+$clients = admin_client_list($conn);
 
 // Stat card numbers are computed from the data above.
 $totalClients    = count($clients);
@@ -210,6 +128,9 @@ if (!function_exists('h')) {
                             </thead>
 
                             <tbody id="clientRows">
+                                <?php if (!$clients): ?>
+                                    <tr><td colspan="6" style="text-align:center;padding:22px 11px;">No clients have registered yet.</td></tr>
+                                <?php endif; ?>
                                 <?php foreach ($clients as $client): ?>
                                     <?php
                                     $statusClass  = strtolower(str_replace(' ', '-', $client['status']));
@@ -348,6 +269,7 @@ if (!function_exists('h')) {
     </main>
 </div>
 
+<script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
 <script>
 // ---------------------------------------------------------------
 // Element references
@@ -388,7 +310,7 @@ const statusClassName = status => status.toLowerCase().replace(/\s+/g, '-');
 // Stats
 // ---------------------------------------------------------------
 function updateStats() {
-    const rows     = [...rowsContainer.querySelectorAll('tr')];
+    const rows     = [...rowsContainer.querySelectorAll('tr.client-row')];
     const active   = rows.filter(row => row.dataset.status === 'Active').length;
 
     setText('statAll', rows.length);
@@ -400,7 +322,7 @@ function updateStats() {
 // Search, filter and sort
 // ---------------------------------------------------------------
 function refreshRows(keepPage) {
-    const rows  = [...rowsContainer.querySelectorAll('tr')];
+    const rows  = [...rowsContainer.querySelectorAll('tr.client-row')];
     const query = searchInput.value.trim().toLowerCase();
 
     rows.sort((a, b) => {
@@ -496,7 +418,7 @@ function renderPagination(totalPages) {
 
 // Shows only the rows of the current page (among rows that match search/filter)
 function paginate(keepPage = false) {
-    const allRows = [...rowsContainer.querySelectorAll('tr')];
+    const allRows = [...rowsContainer.querySelectorAll('tr.client-row')];
     const matched = allRows.filter(row => row.dataset.match !== '0');
     const totalPages = Math.max(1, Math.ceil(matched.length / ROWS_PER_PAGE));
 
@@ -630,7 +552,7 @@ document.getElementById('historyButton').addEventListener('click', showHistoryVi
 document.getElementById('backButton').addEventListener('click', showProfileView);
 document.getElementById('confirmButton').addEventListener('click', closeClientPanel);
 
-// Activate / deactivate (front-end only; connect to your backend later)
+// Activate / deactivate: saved in the database through backend/api/admin/clients.php
 toggleButton.addEventListener('click', () => {
     if (!currentClient) return;
 
@@ -639,17 +561,30 @@ toggleButton.addEventListener('click', () => {
 
     if (!confirm(action + ' ' + currentClient.name + '?')) return;
 
-    currentClient.status      = nextStatus;
-    currentRow.dataset.client = JSON.stringify(currentClient);
-    currentRow.dataset.status = nextStatus;
+    toggleButton.disabled = true;
+    cfPost('<?= BASE_URL ?>backend/api/admin/clients.php', {
+        action: 'set_status',
+        customer_id: currentClient.customer_id,
+        active: nextStatus === 'Active' ? '1' : '0'
+    }).then(res => {
+        toggleButton.disabled = false;
+        if (!res.success) {
+            alert(cfFirstError(res));
+            return;
+        }
 
-    const badge = currentRow.querySelector('.status');
-    badge.textContent = nextStatus;
-    badge.className   = 'status ' + statusClassName(nextStatus);
+        currentClient.status      = nextStatus;
+        currentRow.dataset.client = JSON.stringify(currentClient);
+        currentRow.dataset.status = nextStatus;
 
-    renderProfile(currentClient);
-    updateStats();
-    refreshRows(true);
+        const badge = currentRow.querySelector('.status');
+        badge.textContent = nextStatus;
+        badge.className   = 'status ' + statusClassName(nextStatus);
+
+        renderProfile(currentClient);
+        updateStats();
+        refreshRows(true);
+    });
 });
 
 // ---------------------------------------------------------------

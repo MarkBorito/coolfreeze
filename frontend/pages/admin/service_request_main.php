@@ -14,16 +14,24 @@ $userName    = $_SESSION['username'] ?? 'Admin';
 $pageTitle   = 'Service Request';
 $currentPage = 'admin_requests'; // matches the 'key' in admin_sidebar.php
 
+$adminId = (int) $_SESSION['admin_id'];
+
 /* ---------- 1. Handle POST (state-changing) BEFORE any HTML ---------- */
+<<<<<<< HEAD
 // The message from the last action is kept in the session, shown once, then removed
 $flash = $_SESSION['sr_flash'] ?? null; // ['type' => 'success'|'error', 'text' => '...']
 unset($_SESSION['sr_flash']);
 $redirectAfterPost = false;
+=======
+$flash = $_SESSION['sr_flash'] ?? null; // ['type' => 'success'|'error', 'text' => '...']
+unset($_SESSION['sr_flash']);
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action    = (string) ($_POST['action'] ?? '');
     $requestId = trim((string) ($_POST['request_id'] ?? ''));
 
+<<<<<<< HEAD
     try {
         if ($action === 'confirm') {
             $techIds = isset($_POST['tech_ids']) && is_array($_POST['tech_ids']) ? $_POST['tech_ids'] : [];
@@ -36,13 +44,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             [$ok, $msg] = [false, 'Unknown action.'];
+=======
+    if ($action === 'confirm') {
+        $techIds = isset($_POST['tech_ids']) && is_array($_POST['tech_ids']) ? $_POST['tech_ids'] : [];
+        [$ok, $msg] = sr_confirm_request($adminId, $requestId, $techIds);
+    } elseif ($action === 'reject') {
+        if (($_POST['confirm_reject'] ?? '') !== '1') {
+            [$ok, $msg] = [false, 'Rejection must be confirmed.'];
+        } else {
+            $reason = mb_substr(trim((string) ($_POST['reason'] ?? '')), 0, 255);
+            [$ok, $msg] = sr_reject_request($adminId, $requestId, $reason === '' ? null : $reason);
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
         }
     } catch (Throwable $e) {
         error_log($e->getMessage());
         [$ok, $msg] = [false, 'Something went wrong. Please try again.'];
     }
+<<<<<<< HEAD
     $_SESSION['sr_flash'] = ['type' => $ok ? 'success' : 'error', 'text' => $msg];
     $redirectAfterPost = true;   // redirect after the filters below are read, so the same page stays open
+=======
+    // Post/Redirect/Get: a refresh must not re-submit the form
+    $_SESSION['sr_flash'] = ['type' => $ok ? 'success' : 'error', 'text' => $msg];
+    header('Location: ' . BASE_URL . '?' . http_build_query(array_filter([
+        'page'   => 'admin_requests',
+        'q'      => mb_substr(trim((string) ($_GET['q'] ?? '')), 0, 80),
+        'sort'   => (string) ($_GET['sort'] ?? ''),
+        'status' => (string) ($_GET['status'] ?? ''),
+        'pg'     => (string) ($_GET['pg'] ?? ''),
+    ], fn ($v) => $v !== '')));
+    exit;
+>>>>>>> 1d0b29873761f174fe73601e6348df43e1203456
 }
 
 /* ---------- 2. GET filters (whitelisted) ---------- */
@@ -102,7 +134,7 @@ function sr_line(string $icon, string $text, string $extra = ''): void
 }
 function sr_id_header(array $r): void
 {
-    echo '<div class="sr-idblock"><h3>ID: ' . e($r['id']) . '</h3><p>' . e(sr_evaluation_label($r['status'])) . '</p></div>';
+    echo '<div class="sr-idblock"><h3>ID: ' . e($r['id']) . '</h3><p>' . e($r['status'] === 'pending' ? sr_evaluation_label($r['status']) : ($r['status_detail'] ?: sr_status_label($r['status']))) . '</p></div>';
 }
 function sr_client(array $r): void
 {
@@ -116,7 +148,7 @@ function sr_services(array $r): void
 {
     sr_section('Services', function () use ($r) {
         foreach ($r['services'] as $s) {
-            sr_line($s['icon'], $s['name'], '<b class="sr-price">' . e(sr_peso($s['price'])) . '</b>');
+            sr_line($s['icon'], $s['name'] . (($s['detail'] ?? '') !== '' ? ' · ' . $s['detail'] : ''), '<b class="sr-price">' . e(sr_peso($s['price'])) . '</b>');
         }
     });
 }
@@ -276,6 +308,10 @@ function sr_notes(array $r): void
           <div class="sr-view__card">
             <?php sr_id_header($r); sr_client($r); sr_services($r); sr_location($r); sr_schedule($r); sr_notes($r); ?>
 
+            <?php if ($r['status'] === 'cancelled' && $r['cancel_reason']): ?>
+              <?php sr_section('Cancellation Reason', fn () => sr_line('fa-circle-info', $r['cancel_reason'])); ?>
+            <?php endif; ?>
+
             <?php if (!$pending && $r['assigned_technician_ids']): ?>
               <?php sr_section('Technician', function () use ($r) {
                   foreach ($r['assigned_technician_ids'] as $tid) {
@@ -290,7 +326,8 @@ function sr_notes(array $r): void
                 <input type="hidden" name="action" value="reject">
                 <input type="hidden" name="request_id" value="<?= e($r['id']) ?>">
                 <input type="hidden" name="confirm_reject" value="1">
-                <p>Reject <strong><?= e($r['id']) ?></strong>? Its status will become Cancelled.</p>
+                <p>Reject <strong><?= e($r['id']) ?></strong>? Its status will become Cancelled and the client will be notified.</p>
+                <input type="text" name="reason" maxlength="255" placeholder="Reason (optional, the client will see it)" aria-label="Reason for rejecting">
                 <div>
                   <button type="button" class="sr-btn sr-btn--ghost" data-sr-reject-cancel>Keep</button>
                   <button type="submit" class="sr-btn sr-btn--red">Yes, reject</button>
