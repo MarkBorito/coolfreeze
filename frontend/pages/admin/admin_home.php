@@ -119,9 +119,20 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
               <div class="admin-dash">
 
                 <!-- Welcome -->
-                <p class="admin-dash__crumb">Home</p>
-                <h1 class="admin-dash__welcome">Welcome to <span>Cool Freeze, <?= e($userName) ?>!</span></h1>
-                <p class="admin-dash__sub">Here&rsquo;s what&rsquo;s happening today</p>
+                <div class="page-header">
+
+                  <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="<?= BASE_URL ?>frontend/pages/admin/admin_home.php">Home</a>
+                  </nav>
+
+                  <h1 class="page-title">
+                    Welcome to
+                    <span>Cool Freeze, <?= e($userName) ?>!</span>
+                  </h1>
+
+                  <p class="page-subtitle">Here&rsquo;s what&rsquo;s happening today</p>
+
+                </div>
 
                 <!-- Summary cards -->
                 <section class="admin-dash__cards" aria-label="Summary">

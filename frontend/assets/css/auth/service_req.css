@@ -38,11 +38,7 @@
 .sr-body { margin-left: var(--sr-sidebar-width); min-width: 0; }
 .sr-main { padding: 24px var(--sr-space) 40px; max-width: 100%; overflow-x: hidden; }
 
-/* Heading (matches .admin-dash__crumb / __welcome / __sub) */
-.sr-breadcrumb { font-size: 10px; font-weight: 600; color: var(--sr-text-muted); }
-.sr-heading { margin: 6px 0 4px; font-family: "Sora", sans-serif; font-size: 24px; font-weight: 800; line-height: 1.15; letter-spacing: -0.5px; }
-.sr-heading span { color: var(--sr-blue); }
-.sr-subtitle { margin: 0 0 12px; font-size: 11px; line-height: 1.4; color: var(--sr-text-muted); }
+/* Heading: now uses .page-header / .breadcrumb / .page-title / .page-subtitle from main.css */
 
 /* Alerts */
 .sr-alert { padding: 8px 12px; border-radius: var(--sr-radius-sm); margin-bottom: 11px; font-size: 11px; font-weight: 500; border: 1px solid; }
@@ -95,7 +91,7 @@
 /* Pagination */
 .sr-pagination { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 10px 0 12px; }
 .sr-pagination a, .sr-pagination span { display: inline-grid; place-items: center; color: var(--sr-text); text-decoration: none; font-size: 10px; }
-.sr-page { width: 18px; height: 18px; border-radius: 4px; background: var(--sr-card-bg); border: 1px solid var(--sr-border); 
+.sr-page { width: 18px; height: 18px; border-radius: 4px; background: var(--sr-card-bg); border: 1px solid var(--sr-border);
 
 }
 
@@ -157,7 +153,6 @@
 @media (max-width: 900px) {
   .sr-body { margin-left: 0; }
   .sr-main { padding: 20px 16px 32px; }
-  .sr-heading { font-size: 22px; }
   .sr-drawer { top: auto; right: 0; left: 0; bottom: 0; width: 100%; max-width: 100%; max-height: 92vh; border-radius: var(--sr-radius) var(--sr-radius) 0 0; }
 }
 @media (max-width: 560px) {
