@@ -584,9 +584,41 @@ foreach ($requests as $request) {
 
   document.addEventListener('DOMContentLoaded', function() {
 
-  
+    // -------------------- Mobile sidebar toggle --------------------
+    var sidebar = document.getElementById('sidebar');
+    var sidebarOverlay = document.getElementById('overlay');
+    var menuButton = document.getElementById('menuButton');
 
+    var setSidebarOpen = function(open) {
+      sidebar.classList.toggle('open', open);
+      sidebarOverlay.classList.toggle('open', open);
+      menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    };
 
+    if (menuButton && sidebar && sidebarOverlay) {
+
+      menuButton.addEventListener('click', function() {
+        setSidebarOpen(!sidebar.classList.contains('open'));
+      });
+
+      sidebarOverlay.addEventListener('click', function() {
+        setSidebarOpen(false);
+      });
+
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          setSidebarOpen(false);
+        }
+      });
+
+      // Close the drawer if the window is resized past the mobile breakpoint
+      window.addEventListener('resize', function() {
+        if (!window.matchMedia('(max-width: 900px)').matches) {
+          setSidebarOpen(false);
+        }
+      });
+
+    }
 
 
     // -------------------- Request list + detail panel --------------------
