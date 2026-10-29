@@ -210,4 +210,57 @@
   sidebar.querySelectorAll('a').forEach(function (a) {
     a.addEventListener('click', function () { sidebar.classList.remove('open'); });
   });
+  (function () {
+  const form = document.getElementById('srFilterForm');
+  if (!form) return;
+
+  const input = form.querySelector('input[name="q"]');
+  let timer = null;
+  let controller = null;
+
+  function buildUrl() {
+    const params = new URLSearchParams(new FormData(form));
+    for (const [key, value] of [...params]) {
+      if (value === '') params.delete(key);
+    }
+    params.delete('pg'); // new search -> back to page 1
+    return '?' + params.toString();
+  }
+
+  async function refresh() {
+    if (controller) controller.abort(); // cancel the previous request
+    controller = new AbortController();
+    const url = buildUrl();
+
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+
+      const fresh = doc.querySelector('.sr-table-card');
+      const current = document.querySelector('.sr-table-card');
+      if (fresh && current) current.replaceWith(fresh);
+
+      history.replaceState(null, '', url);
+    } catch (err) {
+      if (err.name !== 'AbortError') form.submit(); // fallback: normal reload
+    }
+  }
+
+  // Search as you type (250ms pause so it doesn't fire on every keystroke)
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    timer = setTimeout(refresh, 250);
+  });
+
+  // Sort and status dropdowns also update live
+  form.querySelectorAll('select').forEach(sel => sel.addEventListener('change', refresh));
+
+  // Enter key should not reload the page
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    clearTimeout(timer);
+    refresh();
+  });
+})();
 })();
