@@ -168,3 +168,20 @@
   .sr-btn { min-width: 100px; height: 42px; font-size: 16px; }
   .sr-idblock h3 { font-size: 26px; }
 }
+
+/* Responsive admin service-request grids and table */
+@media (max-width: 900px) {
+  .sr-shell, .sr-section, .sr-table-card { min-width: 0; max-width: 100%; }
+  .sr-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sr-table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .sr-table { min-width: 760px; }
+}
+@media (max-width: 520px) {
+  .sr-shell, .sr-page { width: 100%; min-width: 0; }
+  .sr-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .sr-stat { min-width: 0; padding: 10px; }
+  .sr-heading { flex-wrap: wrap; gap: 8px; }
+  .sr-filters { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; }
+  .sr-search, .sr-select { width: 100%; min-width: 0; }
+  .sr-table-card { padding: 10px; }
+}

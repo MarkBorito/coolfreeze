@@ -92,9 +92,11 @@
 .locked .switch, .locked select { pointer-events: none; opacity: .75; }
 
 /* Modals */
-.modal { position: fixed; inset: 0; background: rgba(52, 68, 92, .45); display: none; align-items: center; justify-content: center; padding: var(--space); z-index: 100; }
+/* main.css also defines a .modal (the Request Service dialog: max-width 760px, column flex, overflow hidden).
+   Reset those here so this full-screen backdrop spans the whole viewport and the box sits in the middle. */
+.modal { position: fixed; inset: 0; width: 100%; max-width: none; height: 100%; max-height: none; min-height: 0; margin: 0; flex-direction: row; overflow: auto; border-radius: 0; box-shadow: none; background: rgba(52, 68, 92, .45); display: none; align-items: center; justify-content: center; padding: var(--space); z-index: 100; }
 .modal.open { display: flex; }
-.modal-box { background: var(--white); border-radius: 10px; padding: 16px; width: 100%; max-width: 340px; max-height: 90vh; overflow-y: auto; }
+.modal-box { background: var(--white); border-radius: 10px; padding: 16px; width: 100%; max-width: 340px; max-height: 90vh; max-height: 90dvh; overflow-y: auto; margin: auto; }
 .modal-box h3 { margin: 0 0 10px; font-family: "Sora", sans-serif; font-size: 15px; font-weight: 800; }
 .modal-box label { display: block; font-size: 10px; font-weight: 600; margin-bottom: 10px; }
 .modal-box input { display: block; width: 100%; margin-top: 4px; padding: 7px 10px; font-size: 11px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--panel-bg); font-family: inherit; }

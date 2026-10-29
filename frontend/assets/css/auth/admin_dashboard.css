@@ -239,3 +239,22 @@
   .dash-panel__head { padding: 0 12px; }
   .dash-panel__head h2 { font-size: 16px; }
 }
+
+/* Mobile/tablet grid consistency with the other admin pages */
+.admin-dash, .admin-dash * { min-width: 0; }
+.admin-dash__cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.admin-dash__bottom { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dash-panel, .dash-table-wrap { min-width: 0; }
+.dash-table-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.dash-table { min-width: 520px; }
+@media (max-width: 900px) {
+  .admin-dash__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-dash__bottom { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .admin-dash__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .dash-card { min-height: 105px; padding: 10px; }
+  .dash-card__value { font-size: clamp(20px, 6vw, 24px); }
+  .admin-dash__bottom { grid-template-columns: minmax(0, 1fr); }
+  .dash-panel { min-width: 0; }
+}

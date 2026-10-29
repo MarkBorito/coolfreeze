@@ -40,19 +40,52 @@ $sidebarMenu = [
         'title' => 'System',
         'items' => [
             ['key' => 'admin_profile', 'label' => 'Profile', 'icon' => 'fa-user',   'link' => '?page=admin_profile'],
-            ['key' => 'faqs',    'label' => 'Setting', 'icon' => 'fa-wrench', 'link' => '?page=faq_main'],
         ],
     ],
     
 ];
 ?>
 
+<style>
+  /* Responsive CoolFreeze logo for every admin page using this sidebar. */
+  #sidebar .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 12px 10px;
+    overflow: hidden;
+  }
+
+  #sidebar .imglogo {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+    max-height: 76px;
+    object-fit: contain;
+    box-sizing: border-box;
+    padding: 0;
+  }
+
+  @media (max-width: 900px) {
+    #sidebar .brand { padding: 10px 12px; }
+    #sidebar .imglogo { max-width: 220px; max-height: 68px; }
+  }
+
+  @media (max-width: 480px) {
+    #sidebar .brand { padding: 9px 10px; }
+    #sidebar .imglogo { max-width: 190px; max-height: 58px; }
+  }
+</style>
+
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 
   <a href="<?= e($sidebarPagesUrl) ?>?page=landing" class="brand">
-    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/coolfreeze_horizontal_logo.svg" alt="Coolfreeze logo"
-      class="card-img" width="240px">
+    <img class="imglogo" src="<?= BASE_URL ?>frontend/assets/img/coolfreeze_horizontal_logo.svg" alt="CoolFreeze logo">
   </a>
 
   <nav class="menu">
