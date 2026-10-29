@@ -319,3 +319,12 @@ INSERT IGNORE INTO service_inclusions (inclusion_id, service_id, label, sort_ord
   (13, 4, 'Site inspection', 1), (14, 4, 'Proper unit installation', 2), (15, 4, 'System testing', 3), (16, 4, 'Warranty and support', 4),
   (17, 5, 'Genuine parts', 1), (18, 5, 'Professional installation', 2), (19, 5, 'System testing', 3), (20, 5, 'Warranty and replaced parts', 4);
   
+
+
+  INSERT INTO users (role, username, email, password_hash)
+VALUES ('admin', 'admin', 'admin@coolfreeze.com', '$2b$12$m7OQpQQmOdVFXGq/hi3Qg.cEqviZwSqlBhtPXmVzAp37GCqbsZn7S');
+-- Password: Password123
+
+
+INSERT INTO admins (user_id, full_name)
+VALUES (LAST_INSERT_ID(), 'Admin Name');  

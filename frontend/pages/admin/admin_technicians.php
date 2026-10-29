@@ -339,7 +339,7 @@ if (!function_exists('h')) {
 
 <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
 <script>
-const API_URL = '<?= BASE_URL ?>backend/api/admin/technicians.php';
+const API_URL = '<?= BASE_URL ?>backend/api/Admin/technicians.php';
 
 // ---------------------------------------------------------------
 // Element references
