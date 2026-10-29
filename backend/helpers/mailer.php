@@ -103,7 +103,7 @@ function send_reset_code_email(string $email, string $code): void
 
     if ($httpCode < 200 || $httpCode >= 300) {
         // Log the HTTP status, not the secret key or reset code.
-        error_log('Brevo API failed. HTTP ' . $httpCode . ' Response: ' . $response);
+        error_log('Brevo API request failed with HTTP ' . $httpCode);
         throw new RuntimeException('Unable to send email.');
     }
 }
