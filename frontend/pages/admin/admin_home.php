@@ -1,6 +1,8 @@
 <?php
 require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
 require_once BACKEND_PATH . '/helpers/admin_guard.php';
+require_once BACKEND_PATH . '/helpers/service_log.php';
+require_once BACKEND_PATH . '/models/admin_technician.php';   // same data + helpers as the Service Request page
 
 $userName = $_SESSION['username'] ?? 'Admin';
 $currentPage = 'admin_home';
@@ -11,33 +13,32 @@ $currentPage = 'admin_home';
  * Keep the same keys and the HTML below will not need changes.
  * ============================================================ */
 
+// REAL DATA: same source as the Service Request page (request_get_all / request_get_statistics)
+$requestStats = admin_request_stats($conn);
 $dashboardStats = [
-    'pending_requests'   => 12,
-    'confirmed_requests' => 12,
-    'ongoing_services'   => 12,
-    'completed_services' => 12,
+    'pending_requests'   => $requestStats['pending'],
+    'confirmed_requests' => $requestStats['confirmed'],
+    'ongoing_services'   => $requestStats['ongoing'],
+    'completed_services' => $requestStats['completed'],
 ];
 
-$recentRequests = [
-    ['id' => 125, 'client' => 'JuanTzy', 'service' => 'AC Cleaning', 'date' => 'Sep 15', 'status' => 'Pending'],
-    ['id' => 125, 'client' => 'JuanTzy', 'service' => 'AC Cleaning', 'date' => 'Sep 15', 'status' => 'Confirmed'],
-    ['id' => 125, 'client' => 'JuanTzy', 'service' => 'AC Cleaning', 'date' => 'Sep 15', 'status' => 'On going'],
-    ['id' => 125, 'client' => 'JuanTzy', 'service' => 'AC Cleaning', 'date' => 'Sep 15', 'status' => 'Cancelled'],
-];
+// Latest 4 requests, shaped exactly like the rows on the Service Request page
+$recentRequests = [];
+foreach (array_slice(admin_request_list($conn), 0, 4) as $row) {
+    $d = admin_request_find($conn, (int) $row['request_id']);
+    if ($d) {
+        $recentRequests[] = sr_shape_request($d);
+    }
+}
 
 // No 'total' here on purpose: it is calculated below.
-$technicianStats = [
-    'available' => 2,
-    'assigned'  => 3,
-    'off_duty'  => 1,
-];
+// REAL DATA: the technicians added on the Technicians page
+$technicianStats = admin_technician_stats(admin_technician_overview($conn));
 
-$todaySchedule = [
-    ['service' => 'AC Cleaning', 'time' => '9:00 am'],
-    ['service' => 'AC Cleaning', 'time' => '9:00 am'],
-    ['service' => 'AC Cleaning', 'time' => '9:00 am'],
-    ['service' => 'AC Cleaning', 'time' => '9:00 am'],
-];
+// REAL DATA: jobs booked for today. The page keeps this fresh by polling
+// backend/api/Admin/dashboard.php (see frontend/assets/js/admin_home_live.js).
+$todaySchedule = admin_today_schedule($conn);
+$scheduleEndpoint = BASE_URL . 'backend/api/Admin/dashboard.php?action=schedule';
 
 /* ============================================================
  * PRESENTATION HELPERS / CONFIG
@@ -83,8 +84,8 @@ $summaryCards = [
 ];
 
 // "View all" targets. TODO: change to your real admin page filenames.
-$requestsUrl   = BASE_URL . 'frontend/pages/admin/service_requests.php';
-$techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
+$requestsUrl   = BASE_URL . '?page=admin_requests';
+$techniciansUrl = BASE_URL . '?page=admin_technicians';
 ?>
 
 <!DOCTYPE html>
@@ -148,7 +149,7 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
                           <th scope="col">Client</th>
                           <th scope="col">Service</th>
                           <th scope="col">Date</th>
-                          <th scope="col">Status</th>
+                          <th scope="col" class="dash-center">Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -157,15 +158,18 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
                       <?php else: ?>
                         <?php foreach ($recentRequests as $req): ?>
                           <?php
-                            $requestId  = cf_request_id((int) $req['id']);
-                            $searchText = strtolower($requestId . ' ' . $req['client'] . ' ' . $req['service'] . ' ' . $req['date'] . ' ' . $req['status']);
+                            $requestId  = $req['id'];   // "SR-000125"
+                            $extra      = count($req['services']) - 1;
+                            $dateShort  = sr_date_short($req['date']);
+                            $statusText = sr_status_label($req['status']);
+                            $searchText = strtolower($requestId . ' ' . $req['client']['name'] . ' ' . implode(' ', array_column($req['services'], 'name')) . ' ' . $dateShort . ' ' . $statusText);
                           ?>
                           <tr data-search="<?= e($searchText) ?>">
                             <td><?= e($requestId) ?></td>
-                            <td class="dash-strong"><?= e($req['client']) ?></td>
-                            <td><?= e($req['service']) ?></td>
-                            <td><?= e($req['date']) ?></td>
-                            <td><span class="dash-pill dash-pill--<?= e(cf_status_class($req['status'])) ?>"><?= e($req['status']) ?></span></td>
+                            <td class="dash-strong"><?= e($req['client']['name']) ?></td>
+                            <td><?= e($req['services'][0]['name'] ?? '-') ?><?= $extra > 0 ? ' <small>+' . $extra . '</small>' : '' ?></td>
+                            <td><?= e($dateShort) ?></td>
+                            <td class="dash-center"><span class="dash-pill dash-pill--<?= e($req['status']) ?>"><?= e($statusText) ?></span></td>
                           </tr>
                         <?php endforeach; ?>
                         <tr class="dash-empty" id="dashNoMatch" hidden><td colspan="5">No requests match your search.</td></tr>
@@ -201,25 +205,31 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
                     </div>
                   </section>
 
-                  <!-- Today's Schedule -->
-                  <section class="dash-panel" aria-labelledby="schedTitle">
+                  <!-- Today's Schedule (live: refreshed by admin_home_live.js) -->
+                  <section class="dash-panel" id="dashSchedule" aria-labelledby="schedTitle" data-endpoint="<?= e($scheduleEndpoint) ?>">
                     <div class="dash-panel__head">
-                      <h2 id="schedTitle">Today&rsquo;s Schedule</h2>
+                      <div class="dash-panel__title">
+                        <h2 id="schedTitle">Today&rsquo;s Schedule</h2>
+                        <span class="dash-live" id="dashLive" data-state="live" role="status" aria-live="polite" title="Updates automatically">
+                          <span class="dash-live__dot" aria-hidden="true"></span><span id="dashLiveText">Live</span>
+                        </span>
+                      </div>
                       <a class="dash-viewall" href="<?= e($requestsUrl) ?>">View all <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                     <div class="dash-table-wrap">
                       <table class="dash-table dash-table--schedule">
                         <thead>
-                          <tr><th scope="col">Service</th><th scope="col">Time</th></tr>
+                          <tr><th scope="col">Service</th><th scope="col">Time</th><th scope="col" class="dash-center">Status</th></tr>
                         </thead>
-                        <tbody>
+                        <tbody id="dashScheduleBody">
                         <?php if (empty($todaySchedule)): ?>
-                          <tr class="dash-empty"><td colspan="2">Nothing scheduled for today.</td></tr>
+                          <tr class="dash-empty"><td colspan="3">Nothing scheduled for today.</td></tr>
                         <?php else: ?>
                           <?php foreach ($todaySchedule as $item): ?>
-                            <tr>
-                              <td><i class="fa-solid fa-fan" aria-hidden="true"></i><?= e($item['service']) ?></td>
+                            <tr title="<?= e($item['id'] . ($item['technicians'] !== '' ? ' - ' . $item['technicians'] : '')) ?>">
+                              <td><i class="fa-solid fa-fan" aria-hidden="true"></i><?= e($item['service']) ?><?= $item['extra'] > 0 ? ' <small>+' . (int) $item['extra'] . '</small>' : '' ?></td>
                               <td><?= e($item['time']) ?></td>
+                              <td class="dash-center"><span class="dash-pill dash-pill--<?= e($item['status']) ?>"><?= e($item['status_label']) ?></span></td>
                             </tr>
                           <?php endforeach; ?>
                         <?php endif; ?>
@@ -237,5 +247,7 @@ $techniciansUrl = BASE_URL . 'frontend/pages/admin/technicians.php';
     </div>
 
     <script src="<?= BASE_URL ?>frontend/assets/js/service_reqs.js"></script>
+    <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
+    <script src="<?= BASE_URL ?>frontend/assets/js/admin_home_live.js"></script>
 </body>
 </html>

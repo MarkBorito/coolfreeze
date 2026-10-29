@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash  VARCHAR(255) NOT NULL,
   is_active      TINYINT(1)   NOT NULL DEFAULT 1,
   last_login_at  DATETIME     NULL,
+  password_changed_at DATETIME NULL,
   created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (user_id),
@@ -46,6 +47,11 @@ CREATE TABLE IF NOT EXISTS admins (
   user_id     INT UNSIGNED NOT NULL,
   full_name   VARCHAR(100) NOT NULL,
   phone       VARCHAR(20)  NULL,
+  profile_image        VARCHAR(255) NULL,
+  two_factor           TINYINT(1)   NOT NULL DEFAULT 0,
+  failed_login_protect TINYINT(1)   NOT NULL DEFAULT 1,
+  auto_logout          TINYINT(1)   NOT NULL DEFAULT 0,
+  logout_after         SMALLINT UNSIGNED NOT NULL DEFAULT 30,
   created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (admin_id),
@@ -59,6 +65,10 @@ CREATE TABLE IF NOT EXISTS technicians (
   user_id        INT UNSIGNED NOT NULL,
   full_name      VARCHAR(100) NOT NULL,
   phone          VARCHAR(20)  NOT NULL,
+  specialty      VARCHAR(100) NULL,
+  address        VARCHAR(255) NULL,
+  work_days      VARCHAR(60)  NULL,
+  work_hours     VARCHAR(40)  NULL,
   profile_image  VARCHAR(255) NULL,
   availability   ENUM('available','on_job','off_duty') NOT NULL DEFAULT 'available',
   created_by     INT UNSIGNED NULL,
@@ -76,6 +86,8 @@ CREATE TABLE IF NOT EXISTS services (
   service_id    INT UNSIGNED NOT NULL AUTO_INCREMENT,
   name          VARCHAR(100) NOT NULL,
   description   VARCHAR(255) NULL,
+  category      VARCHAR(50)  NULL,
+  duration      VARCHAR(30)  NULL,
   icon          VARCHAR(50)  NULL,              
   image         VARCHAR(255) NULL,
   base_price    DECIMAL(10,2) NOT NULL DEFAULT 0.00,  
@@ -149,6 +161,7 @@ CREATE TABLE IF NOT EXISTS service_requests (
   KEY idx_requests_customer (customer_id),
   KEY idx_requests_status (status),
   KEY idx_requests_scheduled (scheduled_date),
+  KEY idx_requests_submitted (submitted_at),
   CONSTRAINT fk_requests_customer FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
   CONSTRAINT fk_requests_reviewer FOREIGN KEY (reviewed_by) REFERENCES admins (admin_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
@@ -260,6 +273,19 @@ CREATE TABLE IF NOT EXISTS password_resets (
   KEY idx_reset_email (user_type, email)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS login_history (
+  history_id  INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id     INT UNSIGNED NOT NULL,
+  status      ENUM('Success','Failed') NOT NULL,
+  device      VARCHAR(60)  NULL,
+  ip_address  VARCHAR(45)  NULL,
+  created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (history_id),
+  KEY idx_login_user (user_id, created_at),
+  CONSTRAINT fk_login_user FOREIGN KEY (user_id)
+    REFERENCES users (user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS activity_logs (
   log_id       INT UNSIGNED NOT NULL AUTO_INCREMENT,
   admin_id     INT UNSIGNED NULL,
@@ -292,3 +318,4 @@ INSERT IGNORE INTO service_inclusions (inclusion_id, service_id, label, sort_ord
   (9, 3, 'Full system check', 1), (10, 3, 'Clean and inspect components', 2), (11, 3, 'Optimize performance', 3), (12, 3, 'Extend unit lifespan', 4),
   (13, 4, 'Site inspection', 1), (14, 4, 'Proper unit installation', 2), (15, 4, 'System testing', 3), (16, 4, 'Warranty and support', 4),
   (17, 5, 'Genuine parts', 1), (18, 5, 'Professional installation', 2), (19, 5, 'System testing', 3), (20, 5, 'Warranty and replaced parts', 4);
+  

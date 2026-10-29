@@ -1,35 +1,65 @@
 <?php
+require_once dirname(__DIR__, 3) . '/backend/bootstrap.php';
+require_once BACKEND_PATH . '/helpers/admin_guard.php';
+require_once BACKEND_PATH . '/models/admin_profile.php';
+
 // Same setup style as admin_home.php
 $userName    = $_SESSION['username'] ?? 'Admin';
 $currentPage = 'admin_profile';   // highlights "Profile" in the shared sidebar
 
-$pageTitle    = 'Admin Profile';
-$assetsPath   = BASE_URL . 'frontend/assets';
-$profileImage = $assetsPath . '/img/admin-profile.jpg';   // CHECK: change if your image is elsewhere
+$pageTitle  = 'Admin Profile';
+$assetsPath = BASE_URL . 'frontend/assets';
+
+// REAL DATA: admins + users + login_history (see backend/models/admin_profile.php).
+// Saving goes through backend/api/Admin/profile.php.
+try {
+    $view = admin_profile_view($conn, (int) $_SESSION['admin_id'], 50);
+} catch (mysqli_sql_exception $e) {
+    error_log($e->getMessage());
+    if (in_array($e->getCode(), [1054, 1146], true)) {   // unknown column / table: the SQL update was not run yet
+        http_response_code(500);
+        exit('<p style="font-family:sans-serif;padding:24px">The Profile page needs a one-time database update. '
+           . 'Run <code>database/admin_profile_analytics.sql</code>, then reload this page.</p>');
+    }
+    throw $e;
+}
+if (!$view) {
+    header('Location: ' . BASE_URL . '?page=login');
+    exit;
+}
+$p   = $view['profile'];
+$sec = $view['security'];
+
+// Grey avatar used until a photo is uploaded
+$defaultAvatar = 'data:image/svg+xml;utf8,' . rawurlencode(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" fill="#bcd3f7"/>'
+  . '<circle cx="48" cy="38" r="16" fill="#fff"/><path d="M16 96c0-20 14-32 32-32s32 12 32 32z" fill="#fff"/></svg>'
+);
+$profileImage = $p['image_url'] ?: $defaultAvatar;
 
 $admin = [
-    'full_name' => 'Admin User', 'role' => 'Administrator', 'employee_id' => 'ADM-001',
-    'status' => 'Active', 'created_at' => 'September 16, 2026',
+    'full_name'   => $p['full_name'],
+    'role'        => $p['role'],
+    'employee_id' => $p['code'],
+    'status'      => $p['status'],
+    'created_at'  => $p['created'],
 ];
-$contactInfo = ['email' => 'admin@coolfreeze.com', 'phone' => '0999-999-9999'];
+$contactInfo    = ['email' => $p['email'], 'phone' => $p['phone'] !== '' ? $p['phone'] : 'Not set'];
 $accountDetails = [
-    'username' => 'admin',
-    'password_mask' => '******',
-    'password_last_changed' => 'September 10, 2026',
+    'username'              => $p['username'],
+    'password_mask'         => '********',          // the real password is never stored or shown
+    'password_last_changed' => $sec['password_changed'],
 ];
-$systemAccess = ['last_login' => 'Sep 18 2026', 'login_attempts' => 'Successful'];
+$systemAccess = ['last_login' => $sec['last_login'], 'login_attempts' => $sec['login_attempts']];
 $securitySettings = [
-    ['key' => 'two_factor', 'title' => 'Two-Factor Authentication', 'desc' => 'Add an extra layer of security', 'enabled' => false],
-    ['key' => 'failed_login', 'title' => 'Failed Login Protection', 'desc' => 'Protect account from repeated failed login attempts', 'enabled' => false],
-    ['key' => 'auto_logout', 'title' => 'Auto Logout', 'desc' => 'Automatically log out the admin after a period of inactivity', 'enabled' => true],
+    ['key' => 'two_factor',   'title' => 'Two-Factor Authentication', 'desc' => 'Add an extra layer of security', 'enabled' => $sec['two_factor']],
+    ['key' => 'failed_login', 'title' => 'Failed Login Protection',   'desc' => 'Protect account from repeated failed login attempts', 'enabled' => $sec['failed_login']],
+    ['key' => 'auto_logout',  'title' => 'Auto Logout',               'desc' => 'Automatically log out the admin after a period of inactivity', 'enabled' => $sec['auto_logout']],
 ];
-$logoutOptions = [15, 30, 60, 120];
-$logoutAfter = 30;
-$loginHistory = [
-    ['date' => 'Sep 16', 'device' => 'Windows PC', 'status' => 'Success'],
-    ['date' => 'Sep 15', 'device' => 'Android',    'status' => 'Success'],
-    ['date' => 'Sep 15', 'device' => 'Windows PC', 'status' => 'Success'],
-];
+$logoutOptions   = ADMIN_LOGOUT_OPTIONS;
+$logoutAfter     = $sec['logout_after'];
+$loginHistoryAll = $view['history'];
+$loginHistory    = array_slice($loginHistoryAll, 0, 3);   // "Recent Login Activity" card
 
 if (!function_exists('e')) {
     function e($v) { return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8'); }
@@ -131,9 +161,8 @@ if (!function_exists('field')) {
                         <div class="section">
                             <div class="section-head"><i class="fa-solid fa-user"></i><h3>Password</h3></div>
                             <div class="info-row"><span class="info-label">Password</span>
-                                <div class="info-field with-icon"><span id="pwDisplay" data-mask="***********" data-real="Placeholder1">***********</span>
-                                    <button class="icon-btn" id="pwEye" aria-label="Show or hide password"><i class="fa-solid fa-eye-slash"></i></button></div></div>
-                            <div class="info-row"><span class="info-label">Last changed</span><div class="info-field"><?= e($accountDetails['password_last_changed']) ?></div></div>
+                                <div class="info-field with-icon"><span id="pwDisplay">***********</span></div></div>
+                            <div class="info-row"><span class="info-label">Last changed</span><div class="info-field" id="pwChanged"><?= e($accountDetails['password_last_changed']) ?></div></div>
                             <div class="section-foot"><button class="btn btn-outline" data-open="passwordModal"><i class="fa-solid fa-pen-to-square"></i>Change Password</button></div>
                         </div>
 
@@ -152,13 +181,15 @@ if (!function_exists('field')) {
                                         <?php foreach ($logoutOptions as $m): ?><option value="<?= $m ?>" <?= $m === $logoutAfter ? 'selected' : '' ?>><?= $m ?> minutes</option><?php endforeach; ?>
                                     </select></div>
                             </div>
+                            <p class="form-msg" id="securityMsg" role="alert"></p>
                         </div>
 
                         <div class="section">
                             <div class="section-head"><i class="fa-solid fa-circle-info"></i><h3>Recent Login Activity</h3></div>
                             <?php foreach ($loginHistory as $row): ?>
-                                <div class="plain-row"><strong><?= e($row['date']) ?></strong><span class="device"><?= e($row['device']) ?></span><span class="badge"><?= e($row['status']) ?></span></div>
+                                <div class="plain-row"><strong><?= e($row['date']) ?></strong><span class="device"><?= e($row['device']) ?></span><span class="badge <?= $row['status'] === 'Failed' ? 'failed' : '' ?>"><?= e($row['status']) ?></span></div>
                             <?php endforeach; ?>
+                            <?php if (!$loginHistory): ?><p class="empty-note">No login activity yet.</p><?php endif; ?>
                             <div class="section-foot"><button class="btn btn-outline" data-open="historyModal">View Login History</button></div>
                         </div>
                     </div>
@@ -174,9 +205,10 @@ if (!function_exists('field')) {
     <form id="editForm">
         <label data-group="personal all">Full Name<input id="f_full_name" name="full_name" value="<?= e($admin['full_name']) ?>" required></label>
         <label data-group="contact all">Email Address<input id="f_email" name="email" type="email" value="<?= e($contactInfo['email']) ?>" required></label>
-        <label data-group="contact all">Contact Number<input id="f_phone" name="phone" value="<?= e($contactInfo['phone']) ?>" required></label>
+        <label data-group="contact all">Contact Number<input id="f_phone" name="phone" value="<?= e($p['phone']) ?>" placeholder="e.g. 0917 123 4567" autocomplete="off"></label>
         <label data-group="account all">Username<input id="f_username" name="username" value="<?= e($accountDetails['username']) ?>" required></label>
-        <div class="modal-actions"><button type="button" class="btn btn-outline" data-close>Cancel</button><button type="submit" class="btn btn-solid">Save Changes</button></div>
+        <p class="form-msg" id="editMsg" role="alert"></p>
+        <div class="modal-actions"><button type="button" class="btn btn-outline" data-close>Cancel</button><button type="submit" class="btn btn-solid" id="editSave">Save Changes</button></div>
     </form>
 </div></div>
 
@@ -195,12 +227,19 @@ if (!function_exists('field')) {
 <!-- History modal -->
 <div class="modal" id="historyModal" aria-hidden="true"><div class="modal-box">
     <h3>Login History</h3>
-    <?php foreach ($loginHistory as $row): ?>
-        <div class="plain-row"><strong><?= e($row['date']) ?></strong><span class="device"><?= e($row['device']) ?></span><span class="badge"><?= e($row['status']) ?></span></div>
+    <div class="history-scroll">
+    <?php foreach ($loginHistoryAll as $row): ?>
+        <div class="plain-row"><strong><?= e($row['date']) ?></strong><span class="device"><?= e($row['device']) ?></span><span class="badge <?= $row['status'] === 'Failed' ? 'failed' : '' ?>"><?= e($row['status']) ?></span></div>
     <?php endforeach; ?>
+    <?php if (!$loginHistoryAll): ?><p class="empty-note">No login activity yet.</p><?php endif; ?>
+    </div>
     <div class="modal-actions"><button type="button" class="btn btn-outline" data-close>Close</button></div>
 </div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="<?= BASE_URL ?>frontend/assets/js/alerts.js"></script>
+<script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
+<script>window.CF_PROFILE = { api: '<?= BASE_URL ?>backend/api/admin/profile.php', defaultAvatar: <?= json_encode($defaultAvatar) ?> };</script>
 <script src="<?= e($assetsPath) ?>/js/admin-profile.js"></script>
 </body>
 </html>

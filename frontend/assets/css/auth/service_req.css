@@ -149,6 +149,7 @@
 .sr-reject-box { margin-top: 14px; padding: 12px; border: 1px solid var(--sr-red); background: var(--sr-red-soft); border-radius: var(--sr-radius-sm); }
 .sr-reject-box p { margin: 0 0 10px; font-size: 14px; color: var(--sr-text); }
 .sr-reject-box div { display: flex; gap: 10px; justify-content: flex-end; }
+.sr-reject-box input[type="text"] { width: 100%; box-sizing: border-box; margin: 0 0 10px; padding: 9px 12px; border: 1px solid var(--sr-red); border-radius: var(--sr-radius-sm); font: inherit; font-size: 14px; background: #fff; }
 .sr-reject-box .sr-btn { height: 38px; font-size: 15px; min-width: 100px; }
 
 @media (max-width: 1100px) {
