@@ -239,7 +239,7 @@ if (!function_exists('field')) {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="<?= BASE_URL ?>frontend/assets/js/alerts.js"></script>
 <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
-<script>window.CF_PROFILE = { api: '<?= BASE_URL ?>backend/api/admin/profile.php', defaultAvatar: <?= json_encode($defaultAvatar) ?> };</script>
+<script>window.CF_PROFILE = { api: '<?= BASE_URL ?>backend/api/Admin/profile.php', defaultAvatar: <?= json_encode($defaultAvatar) ?> };</script>
 <script src="<?= e($assetsPath) ?>/js/admin-profile.js"></script>
 </body>
 </html>

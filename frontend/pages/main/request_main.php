@@ -83,15 +83,19 @@ foreach (request_list_for_customer($conn, $customerId) as $row) {
 
 $totalRequests = count($requests);
 
-function e($value)
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+if (!function_exists('e')) {
+    function e($value)
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    }
 }
 
 // Turn a status label into a CSS class suffix, e.g. "On going" -> "ongoing"
-function statusClass($status)
-{
-    return strtolower(str_replace(' ', '', $status));
+if (!function_exists('statusClass')) {
+    function statusClass($status)
+    {
+        return strtolower(str_replace(' ', '', $status));
+    }
 }
 
 // Pre-compute each request's total + a joined service title, and build the
@@ -574,7 +578,6 @@ foreach ($requests as $request) {
      JAVASCRIPT
 ========================================================= -->
 
-  <script src="<?= BASE_URL ?>frontend/assets/js/custom.js"></script>
   <script src="<?= BASE_URL ?>frontend/assets/js/api.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="<?= BASE_URL ?>frontend/assets/js/alerts.js"></script>
@@ -585,19 +588,25 @@ foreach ($requests as $request) {
   document.addEventListener('DOMContentLoaded', function() {
 
     // -------------------- Mobile sidebar toggle --------------------
+    // NOTE: this page handles the burger itself. Do not also load custom.js here,
+    // it binds the same #menuButton and would reopen/close the drawer twice.
     var sidebar = document.getElementById('sidebar');
     var sidebarOverlay = document.getElementById('overlay');
     var menuButton = document.getElementById('menuButton');
 
     var setSidebarOpen = function(open) {
+      if (!sidebar || !sidebarOverlay || !menuButton) return;
+
       sidebar.classList.toggle('open', open);
       sidebarOverlay.classList.toggle('open', open);
       menuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+      menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('sidebar-open', open);
     };
 
     if (menuButton && sidebar && sidebarOverlay) {
-
-      menuButton.addEventListener('click', function() {
+      menuButton.addEventListener('click', function(event) {
+        event.preventDefault();
         setSidebarOpen(!sidebar.classList.contains('open'));
       });
 
@@ -605,19 +614,25 @@ foreach ($requests as $request) {
         setSidebarOpen(false);
       });
 
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-          setSidebarOpen(false);
-        }
+      // Close the mobile drawer after selecting a navigation link.
+      sidebar.querySelectorAll('a, button').forEach(function(item) {
+        item.addEventListener('click', function() {
+          if (window.matchMedia('(max-width: 900px)').matches) {
+            setSidebarOpen(false);
+          }
+        });
       });
 
-      // Close the drawer if the window is resized past the mobile breakpoint
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') setSidebarOpen(false);
+      });
+
+      // Reset drawer state when returning to desktop layout.
       window.addEventListener('resize', function() {
         if (!window.matchMedia('(max-width: 900px)').matches) {
           setSidebarOpen(false);
         }
       });
-
     }
 
 

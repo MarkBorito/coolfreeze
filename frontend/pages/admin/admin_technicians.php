@@ -560,9 +560,32 @@ availabilityButton.addEventListener('click', () => {
     });
 });
 
-document.getElementById('menuButton')?.addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
-});
+(() => {
+    const sidebar = document.getElementById('sidebar');
+    const menuButton = document.getElementById('menuButton');
+    const overlay = document.getElementById('overlay');
+    if (!sidebar || !menuButton || !overlay) return;
+
+    const setMenuOpen = (open) => {
+        sidebar.classList.toggle('open', open);
+        overlay.classList.toggle('show', open);
+        overlay.classList.toggle('open', open);
+        menuButton.setAttribute('aria-expanded', String(open));
+        menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+        document.body.classList.toggle('admin-menu-open', open);
+    };
+
+    menuButton.addEventListener('click', () => {
+        setMenuOpen(!sidebar.classList.contains('open'));
+    });
+    overlay.addEventListener('click', () => setMenuOpen(false));
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') setMenuOpen(false);
+    });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) setMenuOpen(false);
+    });
+})();
 
 // ---------------------------------------------------------------
 // New Technician form

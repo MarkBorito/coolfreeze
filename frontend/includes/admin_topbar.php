@@ -28,7 +28,7 @@ $headerPagesUrl = BASE_URL;
 <!-- TOPBAR -->
 <header class="topbar">
 
-  <button type="button" class="menu-button" id="menuButton" aria-label="Open menu">
+  <button type="button" class="menu-button" id="menuButton" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
     <i class="fa-solid fa-bars"></i>
   </button>
 
