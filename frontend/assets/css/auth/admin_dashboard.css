@@ -52,7 +52,7 @@
 /* ---------- Summary cards ---------- */
 .admin-dash__cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 9px;
   margin-bottom: 11px;
 }
@@ -227,15 +227,16 @@
 .admin-dash__bottom .dash-panel { margin-bottom: 0; }
 
 /* ---------- Responsive (keep at the END of the file) ---------- */
-@media (max-width: 992px) {
-  .admin-dash__cards { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 1100px) {
+  .admin-dash__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (max-width: 768px) {
+
+@media (max-width: 560px) {
+  .dash-card { min-height: 114px; padding: 13px; }
+  .dash-card__icon { width: 34px; height: 34px; margin-bottom: 12px; }
+  .dash-card__label { font-size: 13px; }
+  .dash-card__value { font-size: 28px; }
+}
+@media (max-width: 680px) {
   .admin-dash__bottom { grid-template-columns: 1fr; }
-  .admin-dash__welcome { font-size: 22px; }
-}
-@media (max-width: 520px) {
-  .admin-dash__cards { grid-template-columns: 1fr; }
-  .dash-panel__head { padding: 0 12px; }
-  .dash-panel__head h2 { font-size: 16px; }
 }
