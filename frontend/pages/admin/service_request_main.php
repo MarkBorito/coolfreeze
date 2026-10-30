@@ -112,8 +112,17 @@ function sr_client(array $r): void
 function sr_services(array $r): void
 {
     sr_section('Services', function () use ($r) {
-        foreach ($r['services'] as $s) {
-            sr_line($s['icon'], $s['name'] . (($s['detail'] ?? '') !== '' ? ' · ' . $s['detail'] : ''), '<b class="sr-price">' . e(sr_peso($s['price'])) . '</b>');
+        $services = is_array($r['services'] ?? null) ? $r['services'] : [];
+        if (!$services) {
+            sr_line('fa-circle-info', 'No services recorded for this request.');
+            return;
+        }
+        foreach ($services as $s) {
+            sr_line(
+                $s['icon'] ?? 'fa-snowflake',
+                ($s['name'] ?? 'Service') . (($s['detail'] ?? '') !== '' ? ' · ' . $s['detail'] : ''),
+                '<b class="sr-price">' . e(sr_peso($s['price'] ?? 0)) . '</b>'
+            );
         }
     });
 }
@@ -215,19 +224,24 @@ function sr_notes(array $r): void
               <thead>
                 <tr><th>Request ID</th><th>Client</th><th>Service</th><th>Date</th><th class="sr-center">Status</th></tr>
               </thead>
-              <tbody>
+                    <tbody>
                 <?php if (!$pagination['items']): ?>
                   <tr><td colspan="5" class="sr-empty">No service requests found.</td></tr>
                 <?php endif; ?>
-                <?php foreach ($pagination['items'] as $r): $extra = count($r['services']) - 1; ?>
+                <?php foreach ($pagination['items'] as $r):
+                    $services     = is_array($r['services'] ?? null) ? $r['services'] : [];
+                    $extra        = max(0, count($services) - 1);
+                    $firstService = $services[0]['name'] ?? 'No service';
+                    $statusClass  = $statusOptions[$r['status']]['class'] ?? 'pending';
+                ?>
                   <tr class="sr-row" data-sr-row data-request-id="<?= e($r['id']) ?>" tabindex="0" role="button"
                       aria-label="Open <?= e($r['id']) ?>">
                     <td><?= e($r['id']) ?></td>
-                    <td class="sr-strong"><?= e($r['client']['name']) ?></td>
-                    <td><?= e($r['services'][0]['name']) ?><?= $extra > 0 ? ' <small>+' . $extra . '</small>' : '' ?></td>
+                    <td class="sr-strong"><?= e($r['client']['name'] ?? '') ?></td>
+                    <td><?= e($firstService) ?><?= $extra > 0 ? ' <small>+' . $extra . '</small>' : '' ?></td>
                     <td><?= e(sr_date_short($r['date'])) ?></td>
                     <td class="sr-center">
-                      <span class="sr-pill sr-pill--<?= e($statusOptions[$r['status']]['class']) ?>"><?= e(sr_status_label($r['status'])) ?></span>
+                      <span class="sr-pill sr-pill--<?= e($statusClass) ?>"><?= e(sr_status_label($r['status'])) ?></span>
                     </td>
                   </tr>
                 <?php endforeach; ?>

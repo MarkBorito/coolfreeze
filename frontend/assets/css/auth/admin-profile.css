@@ -114,7 +114,32 @@
 .profile-layout .profile-card { height: auto; min-height: 0; align-self: start; margin: 0; }
 .profile-layout .contact-card { margin-bottom: 0; }
 
-/* Responsive (keep at the END of the file) */
+
+.modal {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  flex-direction: row;
+}
+
+.section-head .btn,
+.section-foot .btn {
+  flex: none;
+  height: auto;
+}
+
+.info-row .badge {
+  justify-self: start;
+}
+
+
+.card { height: auto; display: block; overflow: visible; }
+.card:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
+
+
 @media (max-width: 1024px) {
     .profile-layout { grid-template-columns: 210px 1fr; }
 }
